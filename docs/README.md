@@ -1,0 +1,5 @@
+# Curious Elytra [![](http://cf.way2muchnoise.eu/versions/curious-elytra.svg)](https://minecraft.curseforge.com/projects/curious-elytra) [![](http://cf.way2muchnoise.eu/short_curious-elytra_downloads.svg)](https://minecraft.curseforge.com/projects/curious-elytra/files) [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
+
+## Overview
+
+Curious Elytra is a mod that uses the [Caelus API](https://minecraft.curseforge.com/projects/caelus) and the [Curios API](https://minecraft.curseforge.com/projects/curios) to add a new slot, the Back slot, to the player inventory and allows the elytra to be placed into this slot, either directly or through right-clicking with the elytra held in hand. While the elytra is in this slot, it will grant the same flight capabilities as if it was in your chestplate slot. This allows the player to gain the benefits of the elytra without sacrificing an armor slot.

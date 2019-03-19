@@ -1,0 +1,37 @@
+modLoader="javafml"
+loaderVersion="[25,)"
+issueTrackerURL="https://github.com/TheIllusiveC4"
+logoFile="curiouselytra_icon.png"
+[[mods]]
+modId="curiouselytra"
+version="${file.jarVersion}"
+displayName="Curious Elytra"
+displayURL="https://minecraft.curseforge.com/projects/curious-elytra"
+authors="C4"
+description='''
+Adds curio support to the elytra so you can fly and wear chest armor at the same time.
+'''
+[[dependencies.curiouselytra]]
+    modId="forge"
+    mandatory=true
+    versionRange="[25,)"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.curiouselytra]]
+    modId="minecraft"
+    mandatory=true
+    versionRange="[1.13.2]"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.curiouselytra]]
+    modId="caelus"
+    mandatory=true
+    versionRange="[0.2,)"
+    ordering="NONE"
+    side="BOTH"
+[[dependencies.curiouselytra]]
+    modId="curios"
+    mandatory=true
+    versionRange="[0.8,)"
+    ordering="NONE"
+    side="BOTH"
