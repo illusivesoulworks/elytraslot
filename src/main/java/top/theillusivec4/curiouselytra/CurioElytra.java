@@ -80,7 +80,7 @@ public class CurioElytra implements ICurio {
     public void onEquipped(String identifier, EntityLivingBase entityLivingBase) {
         IAttributeInstance attributeInstance = entityLivingBase.getAttribute(CaelusAPI.ELYTRA_FLIGHT);
 
-        if (!attributeInstance.hasModifier(ELYTRA_CURIO_MODIFIER)) {
+        if (!attributeInstance.hasModifier(ELYTRA_CURIO_MODIFIER) && ItemElytra.isUsable(stack)) {
             attributeInstance.applyModifier(ELYTRA_CURIO_MODIFIER);
         }
     }

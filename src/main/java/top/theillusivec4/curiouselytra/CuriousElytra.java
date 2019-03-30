@@ -91,9 +91,7 @@ public class CuriousElytra {
             if (data != null) {
                 ItemStack stack = data.getStack();
                 ItemStack copy = stack.copy();
-                CuriosAPI.getCuriosHandler(livingBase).ifPresent(handler -> {
-                    handler.setStackInSlot(data.getIdentifier(), data.getIndex(), ItemStack.EMPTY);
-                });
+                CuriosAPI.getCuriosHandler(livingBase).ifPresent(handler -> handler.setStackInSlot(data.getIdentifier(), data.getIndex(), ItemStack.EMPTY));
 
                 if (livingBase instanceof EntityPlayer) {
                     ItemHandlerHelper.giveItemToPlayer((EntityPlayer) livingBase, copy);
