@@ -111,6 +111,10 @@ curseforge {
         releaseType = "${curse_release}"
         changelogType = 'markdown'
         changelog = file('docs/CHANGELOG.md')
+        relations {
+            requiredDependency 'curios'
+            requiredDependency 'caelus'
+        }
         addArtifact(sourcesJar)
     }
 }
