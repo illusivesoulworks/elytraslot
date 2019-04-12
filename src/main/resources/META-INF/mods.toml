@@ -1,13 +1,13 @@
 modLoader="javafml"
 loaderVersion="[25,)"
 issueTrackerURL="https://github.com/TheIllusiveC4/CuriousElytra/issues"
-displayURL="${mod_url}"
 logoFile="${mod_icon}"
-authors="${mod_author}"
 [[mods]]
 modId="${mod_id}"
 version="${version}"
 displayName="${mod_name}"
+displayURL="${mod_url}"
+authors="${mod_author}"
 description='''
 ${mod_description}
 '''

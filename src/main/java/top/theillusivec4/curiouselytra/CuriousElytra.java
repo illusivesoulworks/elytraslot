@@ -35,15 +35,17 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.living.LivingEquipmentChangeEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.items.ItemHandlerHelper;
 import top.theillusivec4.caelus.api.event.RenderCapeCheckEvent;
 import top.theillusivec4.curios.api.CuriosAPI;
-import top.theillusivec4.curios.api.CuriosRegistry;
 import top.theillusivec4.curios.api.capability.CuriosCapability;
 import top.theillusivec4.curios.api.capability.ICurio;
+import top.theillusivec4.curios.api.imc.CurioIMCMessage;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -54,12 +56,12 @@ public class CuriousElytra {
     public static final String MODID = "curiouselytra";
 
     public CuriousElytra() {
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
+        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::enqueue);
         MinecraftForge.EVENT_BUS.register(this);
     }
 
-    public void setup(final FMLCommonSetupEvent evt) {
-        CuriosRegistry.getOrRegisterType("back").icon(new ResourceLocation(MODID, "item/empty_back_slot"));
+    private void enqueue(final InterModEnqueueEvent evt) {
+        InterModComms.sendTo("curios", CuriosAPI.IMC.REGISTER_TYPE, () -> new CurioIMCMessage("back"));
     }
 
     @SubscribeEvent
@@ -104,6 +106,11 @@ public class CuriousElytra {
 
     @Mod.EventBusSubscriber(modid = MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
     public static class ClientEvents {
+
+        @SubscribeEvent
+        public static void setupClient(final FMLClientSetupEvent evt) {
+            CuriosAPI.registerIcon("back", new ResourceLocation(MODID, "item/empty_back_slot"));
+        }
 
         @SubscribeEvent
         public static void onRenderCapeCheck(RenderCapeCheckEvent evt) {
