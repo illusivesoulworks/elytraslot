@@ -59,8 +59,8 @@ repositories {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${version_forge}"
-    deobf "top.theillusivec4.curios:curios:1.13.2-0.8"
-    deobf "top.theillusivec4.caelus:caelus:1.13.2-0.2"
+    deobf "top.theillusivec4.curios:curios:${version_curios}"
+    deobf "top.theillusivec4.caelus:caelus:${version_caelus}"
 }
 
 sourceSets {

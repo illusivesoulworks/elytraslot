@@ -32,6 +32,6 @@ ${mod_description}
 [[dependencies.curiouselytra]]
     modId="curios"
     mandatory=true
-    versionRange="[0.8,)"
+    versionRange="[0.10,)"
     ordering="NONE"
     side="BOTH"
