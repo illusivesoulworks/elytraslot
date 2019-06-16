@@ -4,7 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project does not adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 This project uses MCVERSION-MAJORMOD.MAJORAPI.MINOR.PATCH.
 
-## [0.3](https://github.com/TheIllusiveC4/CuriousElytra/compare/16367fdcba811ee73638cdd0659dd8edd24485e3...master) - 2019.04.11
+## [0.4](https://github.com/TheIllusiveC4/CuriousElytra/compare/d8f2109e4956b1052cc4998844c832f8c552954a...master) - 2019.06.16
+### Changed
+- Updated to last Forge and mappings for 1.13.2
+
+### Fixed
+- Fixed dedicated server crash [#1](https://github.com/TheIllusiveC4/CuriousElytra/issues/1)
+
+## [0.3](https://github.com/TheIllusiveC4/CuriousElytra/compare/16367fdcba811ee73638cdd0659dd8edd24485e3...d8f2109e4956b1052cc4998844c832f8c552954a) - 2019.04.11
 ### Changed
 - Updated to 0.10 Curios API
 
