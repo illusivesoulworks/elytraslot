@@ -20,7 +20,7 @@ archivesBaseName = "${mod_id}"
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 
 minecraft {
-    mappings channel: 'snapshot', version: "${version_mcp}".toString()
+    mappings channel: 'snapshot', version: "${version_mcp}"
 
     runs {
         client {
@@ -59,8 +59,8 @@ repositories {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${version_forge}"
-    deobf "top.theillusivec4.curios:curios:${version_curios}"
-    deobf "top.theillusivec4.caelus:caelus:${version_caelus}"
+    compile fg.deobf("top.theillusivec4.curios:curios:${version_curios}")
+    compile fg.deobf("top.theillusivec4.caelus:caelus:${version_caelus}")
 }
 
 sourceSets {
