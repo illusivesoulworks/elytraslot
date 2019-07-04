@@ -19,12 +19,13 @@
 
 package top.theillusivec4.curiouselytra;
 
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
-import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.item.ElytraItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.item.Items;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
@@ -41,7 +42,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.items.ItemHandlerHelper;
-import top.theillusivec4.caelus.api.event.RenderCapeCheckEvent;
+import top.theillusivec4.caelus.api.event.RenderElytraEvent;
 import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.capability.CuriosCapability;
 import top.theillusivec4.curios.api.capability.ICurio;
@@ -68,14 +69,14 @@ public class CuriousElytra {
     public void attachCapabilities(AttachCapabilitiesEvent<ItemStack> evt) {
         ItemStack stack = evt.getObject();
 
-        if (stack.getItem() == Items.ELYTRA) {
+        if (stack.getItem() instanceof ElytraItem) {
             CurioElytra curioElytra = new CurioElytra(stack);
             evt.addCapability(CuriosCapability.ID_ITEM, new ICapabilityProvider() {
                 LazyOptional<ICurio> curio = LazyOptional.of(() -> curioElytra);
 
                 @Nonnull
                 @Override
-                public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable EnumFacing side) {
+                public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
                     return CuriosCapability.ITEM.orEmpty(cap, curio);
                 }
             });
@@ -86,21 +87,19 @@ public class CuriousElytra {
     public void onLivingEquipmentChange(LivingEquipmentChangeEvent evt) {
         ItemStack to = evt.getTo();
 
-        if (evt.getSlot() == EntityEquipmentSlot.CHEST && to.getItem() == Items.ELYTRA) {
-            EntityLivingBase livingBase = evt.getEntityLiving();
-            CuriosAPI.FinderData data = CuriosAPI.getCurioEquipped(Items.ELYTRA, livingBase);
-
-            if (data != null) {
-                ItemStack stack = data.getStack();
+        if (evt.getSlot() == EquipmentSlotType.CHEST && to.getItem() instanceof ElytraItem) {
+            LivingEntity livingBase = evt.getEntityLiving();
+            CuriosAPI.getCurioEquipped(Items.ELYTRA, livingBase).ifPresent(elytra -> {
+                ItemStack stack = elytra.getRight();
                 ItemStack copy = stack.copy();
-                CuriosAPI.getCuriosHandler(livingBase).ifPresent(handler -> handler.setStackInSlot(data.getIdentifier(), data.getIndex(), ItemStack.EMPTY));
+                CuriosAPI.getCuriosHandler(livingBase).ifPresent(handler -> handler.setStackInSlot(elytra.getLeft(), elytra.getMiddle(), ItemStack.EMPTY));
 
-                if (livingBase instanceof EntityPlayer) {
-                    ItemHandlerHelper.giveItemToPlayer((EntityPlayer) livingBase, copy);
+                if (livingBase instanceof PlayerEntity) {
+                    ItemHandlerHelper.giveItemToPlayer((PlayerEntity) livingBase, copy);
                 } else {
                     livingBase.entityDropItem(copy);
                 }
-            }
+            });
         }
     }
 
@@ -108,16 +107,15 @@ public class CuriousElytra {
     public static class ClientEvents {
 
         @SubscribeEvent
-        public static void setupClient(final FMLClientSetupEvent evt) {
-            CuriosAPI.registerIcon("back", new ResourceLocation(MODID, "item/empty_back_slot"));
-        }
+        public static void onRenderCapeCheck(RenderElytraEvent evt) {
 
-        @SubscribeEvent
-        public static void onRenderCapeCheck(RenderCapeCheckEvent evt) {
+            CuriosAPI.getCurioEquipped(Items.ELYTRA, evt.getEntityLiving()).ifPresent(elytra -> {
+                evt.setRenderElytra(Event.Result.ALLOW);
 
-            if (CuriosAPI.getCurioEquipped(Items.ELYTRA, evt.getEntityLiving()) != null) {
-                evt.setResult(Event.Result.DENY);
-            }
+                if (elytra.getRight().isEnchanted()) {
+                    evt.setRenderEnchantmentGlow(Event.Result.ALLOW);
+                }
+            });
         }
     }
 }
