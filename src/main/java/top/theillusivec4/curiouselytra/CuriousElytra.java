@@ -26,8 +26,6 @@ import net.minecraft.item.ElytraItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -38,7 +36,6 @@ import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -103,19 +100,15 @@ public class CuriousElytra {
         }
     }
 
-    @Mod.EventBusSubscriber(modid = MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
-    public static class ClientEvents {
+    @SubscribeEvent
+    public void onRenderElytra(RenderElytraEvent evt) {
 
-        @SubscribeEvent
-        public static void onRenderCapeCheck(RenderElytraEvent evt) {
+        CuriosAPI.getCurioEquipped(Items.ELYTRA, evt.getEntityLiving()).ifPresent(elytra -> {
+            evt.setRenderElytra(Event.Result.ALLOW);
 
-            CuriosAPI.getCurioEquipped(Items.ELYTRA, evt.getEntityLiving()).ifPresent(elytra -> {
-                evt.setRenderElytra(Event.Result.ALLOW);
-
-                if (elytra.getRight().isEnchanted()) {
-                    evt.setRenderEnchantmentGlow(Event.Result.ALLOW);
-                }
-            });
-        }
+            if (elytra.getRight().isEnchanted()) {
+                evt.setRenderEnchantmentGlow(Event.Result.ALLOW);
+            }
+        });
     }
 }
