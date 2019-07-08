@@ -104,8 +104,8 @@ public class CuriousElytra {
     public void onRenderElytra(RenderElytraEvent evt) {
 
         CuriosAPI.getCurioEquipped(Items.ELYTRA, evt.getEntityLiving()).ifPresent(elytra -> {
-            evt.setRenderElytra(Event.Result.ALLOW);
-            evt.setRenderEnchantmentGlow(elytra.getRight().isEnchanted() ? Event.Result.ALLOW : Event.Result.DENY);
+            evt.setRenderElytra(true);
+            evt.setRenderEnchantmentGlow(elytra.getRight().isEnchanted());
         });
     }
 }
