@@ -4,7 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project does not adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 This project uses MCVERSION-MAJORMOD.MAJORAPI.MINOR.PATCH.
 
-## [0.5](https://github.com/TheIllusiveC4/CuriousElytra/compare/7c941dd9b0a23a4acaf81a3d4a0c70d9ecfe865f...master)
+## [0.6](https://github.com/TheIllusiveC4/CuriousElytra/compare/c3f056efd916849b4ffdd88e8d888a5148db5e78...master) - 2019.07.07
+### Changed
+- Updated to Caelus API 0.7
+
+## [0.5](https://github.com/TheIllusiveC4/CuriousElytra/compare/7c941dd9b0a23a4acaf81a3d4a0c70d9ecfe865f...c3f056efd916849b4ffdd88e8d888a5148db5e78) - 2019.07.05
 ### Changed
 - Ported to 1.14.3 Forge
 
