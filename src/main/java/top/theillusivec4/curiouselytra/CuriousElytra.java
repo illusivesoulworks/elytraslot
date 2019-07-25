@@ -14,7 +14,8 @@
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with Curious Elytra.  If not, see <https://www.gnu.org/licenses/>.
+ * License along with Curious Elytra.  If not, see <https://www.gnu
+ * .org/licenses/>.
  */
 
 package top.theillusivec4.curiouselytra;
@@ -32,7 +33,6 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.living.LivingEquipmentChangeEvent;
-import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.common.Mod;
@@ -51,61 +51,73 @@ import javax.annotation.Nullable;
 @Mod(CuriousElytra.MODID)
 public class CuriousElytra {
 
-    public static final String MODID = "curiouselytra";
+  public static final String MODID = "curiouselytra";
 
-    public CuriousElytra() {
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::enqueue);
-        MinecraftForge.EVENT_BUS.register(this);
+  public CuriousElytra() {
+
+    FMLJavaModLoadingContext.get().getModEventBus().addListener(this::enqueue);
+    MinecraftForge.EVENT_BUS.register(this);
+  }
+
+  private void enqueue(final InterModEnqueueEvent evt) {
+
+    InterModComms.sendTo("curios", CuriosAPI.IMC.REGISTER_TYPE, () -> new CurioIMCMessage("back"));
+  }
+
+  @SubscribeEvent
+  public void attachCapabilities(AttachCapabilitiesEvent<ItemStack> evt) {
+
+    ItemStack stack = evt.getObject();
+
+    if (!(stack.getItem() instanceof ElytraItem)) {
+      return;
     }
 
-    private void enqueue(final InterModEnqueueEvent evt) {
-        InterModComms.sendTo("curios", CuriosAPI.IMC.REGISTER_TYPE, () -> new CurioIMCMessage("back"));
+    CurioElytra curioElytra = new CurioElytra(stack);
+    evt.addCapability(CuriosCapability.ID_ITEM, new ICapabilityProvider() {
+      LazyOptional<ICurio> curio = LazyOptional.of(() -> curioElytra);
+
+      @Nonnull
+      @Override
+      public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap,
+                                               @Nullable Direction side) {
+
+        return CuriosCapability.ITEM.orEmpty(cap, curio);
+      }
+    });
+  }
+
+  @SubscribeEvent
+  public void onLivingEquipmentChange(LivingEquipmentChangeEvent evt) {
+
+    ItemStack to = evt.getTo();
+
+    if (evt.getSlot() != EquipmentSlotType.CHEST || !(to.getItem() instanceof ElytraItem)) {
+      return;
     }
 
-    @SubscribeEvent
-    public void attachCapabilities(AttachCapabilitiesEvent<ItemStack> evt) {
-        ItemStack stack = evt.getObject();
+    LivingEntity livingBase = evt.getEntityLiving();
+    CuriosAPI.getCurioEquipped(Items.ELYTRA, livingBase).ifPresent(elytra -> {
+      ItemStack stack = elytra.getRight();
+      ItemStack copy = stack.copy();
+      CuriosAPI.getCuriosHandler(livingBase)
+               .ifPresent(handler -> handler.setStackInSlot(elytra.getLeft(), elytra.getMiddle(),
+                                                            ItemStack.EMPTY));
 
-        if (stack.getItem() instanceof ElytraItem) {
-            CurioElytra curioElytra = new CurioElytra(stack);
-            evt.addCapability(CuriosCapability.ID_ITEM, new ICapabilityProvider() {
-                LazyOptional<ICurio> curio = LazyOptional.of(() -> curioElytra);
+      if (livingBase instanceof PlayerEntity) {
+        ItemHandlerHelper.giveItemToPlayer((PlayerEntity) livingBase, copy);
+      } else {
+        livingBase.entityDropItem(copy);
+      }
+    });
+  }
 
-                @Nonnull
-                @Override
-                public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
-                    return CuriosCapability.ITEM.orEmpty(cap, curio);
-                }
-            });
-        }
-    }
+  @SubscribeEvent
+  public void onRenderElytra(RenderElytraEvent evt) {
 
-    @SubscribeEvent
-    public void onLivingEquipmentChange(LivingEquipmentChangeEvent evt) {
-        ItemStack to = evt.getTo();
-
-        if (evt.getSlot() == EquipmentSlotType.CHEST && to.getItem() instanceof ElytraItem) {
-            LivingEntity livingBase = evt.getEntityLiving();
-            CuriosAPI.getCurioEquipped(Items.ELYTRA, livingBase).ifPresent(elytra -> {
-                ItemStack stack = elytra.getRight();
-                ItemStack copy = stack.copy();
-                CuriosAPI.getCuriosHandler(livingBase).ifPresent(handler -> handler.setStackInSlot(elytra.getLeft(), elytra.getMiddle(), ItemStack.EMPTY));
-
-                if (livingBase instanceof PlayerEntity) {
-                    ItemHandlerHelper.giveItemToPlayer((PlayerEntity) livingBase, copy);
-                } else {
-                    livingBase.entityDropItem(copy);
-                }
-            });
-        }
-    }
-
-    @SubscribeEvent
-    public void onRenderElytra(RenderElytraEvent evt) {
-
-        CuriosAPI.getCurioEquipped(Items.ELYTRA, evt.getEntityLiving()).ifPresent(elytra -> {
-            evt.setRenderElytra(true);
-            evt.setRenderEnchantmentGlow(elytra.getRight().isEnchanted());
-        });
-    }
+    CuriosAPI.getCurioEquipped(Items.ELYTRA, evt.getEntityLiving()).ifPresent(elytra -> {
+      evt.setRenderElytra(true);
+      evt.setRenderEnchantmentGlow(elytra.getRight().isEnchanted());
+    });
+  }
 }

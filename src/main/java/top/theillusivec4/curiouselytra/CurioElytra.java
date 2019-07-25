@@ -14,7 +14,8 @@
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with Curious Elytra.  If not, see <https://www.gnu.org/licenses/>.
+ * License along with Curious Elytra.  If not, see <https://www.gnu
+ * .org/licenses/>.
  */
 
 package top.theillusivec4.curiouselytra;
@@ -37,54 +38,69 @@ import java.util.UUID;
 
 public class CurioElytra implements ICurio {
 
-    public static final AttributeModifier ELYTRA_CURIO_MODIFIER = new AttributeModifier(UUID.fromString("c754faef-9926-4a77-abbe-e34ef0d735aa"),
-            "Elytra curio modifier", 1.0D, AttributeModifier.Operation.ADDITION);
+  public static final AttributeModifier ELYTRA_CURIO_MODIFIER =
+      new AttributeModifier(UUID.fromString("c754faef-9926-4a77-abbe-e34ef0d735aa"),
+                            "Elytra curio modifier", 1.0D, AttributeModifier.Operation.ADDITION);
 
-    private ItemStack stack;
+  private ItemStack stack;
 
-    public CurioElytra(ItemStack stack) {
-        this.stack = stack;
+  public CurioElytra(ItemStack stack) {
+
+    this.stack = stack;
+  }
+
+  @Override
+  public void onCurioTick(String identifier, LivingEntity entityLivingBase) {
+
+    if (entityLivingBase.world.isRemote || !ElytraItem.isUsable(stack)) {
+      return;
     }
 
-    @Override
-    public void onCurioTick(String identifier, LivingEntity entityLivingBase) {
+    Integer ticksFlying =
+        ObfuscationReflectionHelper.getPrivateValue(LivingEntity.class, entityLivingBase,
+                                                    "field_184629_bo");
 
-        if (!entityLivingBase.world.isRemote && ElytraItem.isUsable(stack)) {
-            int ticksFlying = ObfuscationReflectionHelper.getPrivateValue(LivingEntity.class, entityLivingBase, "field_184629_bo");
-
-            if ((ticksFlying + 1) % 20 == 0) {
-                stack.damageItem(1, entityLivingBase, entity -> entity.sendBreakAnimation(EquipmentSlotType.CHEST));
-            }
-        }
+    if (ticksFlying != null && (ticksFlying + 1) % 20 == 0) {
+      stack.damageItem(1, entityLivingBase,
+                       entity -> entity.sendBreakAnimation(EquipmentSlotType.CHEST));
     }
+  }
 
-    @Override
-    public boolean canEquip(String identifier, LivingEntity entityLivingBase) {
-        return !(entityLivingBase.getItemStackFromSlot(EquipmentSlotType.CHEST).getItem() instanceof ElytraItem) &&
-                !CuriosAPI.getCurioEquipped(Items.ELYTRA, entityLivingBase).isPresent();
+  @Override
+  public boolean canEquip(String identifier, LivingEntity entityLivingBase) {
+
+    return !(entityLivingBase.getItemStackFromSlot(EquipmentSlotType.CHEST)
+                             .getItem() instanceof ElytraItem) &&
+           !CuriosAPI.getCurioEquipped(Items.ELYTRA, entityLivingBase).isPresent();
+  }
+
+  @Override
+  public void onEquipped(String identifier, LivingEntity entityLivingBase) {
+
+    IAttributeInstance attributeInstance = entityLivingBase.getAttribute(CaelusAPI.ELYTRA_FLIGHT);
+
+    if (!attributeInstance.hasModifier(ELYTRA_CURIO_MODIFIER) && ElytraItem.isUsable(stack)) {
+      attributeInstance.applyModifier(ELYTRA_CURIO_MODIFIER);
     }
+  }
 
-    @Override
-    public void onEquipped(String identifier, LivingEntity entityLivingBase) {
-        IAttributeInstance attributeInstance = entityLivingBase.getAttribute(CaelusAPI.ELYTRA_FLIGHT);
+  @Override
+  public void onUnequipped(String identifier, LivingEntity entityLivingBase) {
 
-        if (!attributeInstance.hasModifier(ELYTRA_CURIO_MODIFIER) && ElytraItem.isUsable(stack)) {
-            attributeInstance.applyModifier(ELYTRA_CURIO_MODIFIER);
-        }
-    }
+    entityLivingBase.getAttribute(CaelusAPI.ELYTRA_FLIGHT).removeModifier(ELYTRA_CURIO_MODIFIER);
+  }
 
-    @Override
-    public void onUnequipped(String identifier, LivingEntity entityLivingBase) {
-        entityLivingBase.getAttribute(CaelusAPI.ELYTRA_FLIGHT).removeModifier(ELYTRA_CURIO_MODIFIER);
-    }
+  @Override
+  public void playEquipSound(LivingEntity entityLivingBase) {
 
-    @Override
-    public void playEquipSound(LivingEntity entityLivingBase) {
-        entityLivingBase.world.playSound(null, entityLivingBase.getPosition(), SoundEvents.ITEM_ARMOR_EQUIP_ELYTRA, SoundCategory.NEUTRAL, 1.0F, 1.0F);
-    }
+    entityLivingBase.world.playSound(null, entityLivingBase.getPosition(),
+                                     SoundEvents.ITEM_ARMOR_EQUIP_ELYTRA, SoundCategory.NEUTRAL,
+                                     1.0F, 1.0F);
+  }
 
-    @Override
-    public boolean canRightClickEquip() {
-        return true;
-    }
+  @Override
+  public boolean canRightClickEquip() {
+
+    return true;
+  }
 }
