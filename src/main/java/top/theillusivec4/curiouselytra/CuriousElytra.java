@@ -20,6 +20,8 @@
 
 package top.theillusivec4.curiouselytra;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.EquipmentSlotType;
@@ -44,9 +46,6 @@ import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.capability.CuriosCapability;
 import top.theillusivec4.curios.api.capability.ICurio;
 import top.theillusivec4.curios.api.imc.CurioIMCMessage;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 @Mod(CuriousElytra.MODID)
 public class CuriousElytra {
@@ -80,7 +79,7 @@ public class CuriousElytra {
       @Nonnull
       @Override
       public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap,
-                                               @Nullable Direction side) {
+          @Nullable Direction side) {
 
         return CuriosCapability.ITEM.orEmpty(cap, curio);
       }
@@ -100,9 +99,8 @@ public class CuriousElytra {
     CuriosAPI.getCurioEquipped(Items.ELYTRA, livingBase).ifPresent(elytra -> {
       ItemStack stack = elytra.getRight();
       ItemStack copy = stack.copy();
-      CuriosAPI.getCuriosHandler(livingBase)
-               .ifPresent(handler -> handler.setStackInSlot(elytra.getLeft(), elytra.getMiddle(),
-                                                            ItemStack.EMPTY));
+      CuriosAPI.getCuriosHandler(livingBase).ifPresent(
+          handler -> handler.setStackInSlot(elytra.getLeft(), elytra.getMiddle(), ItemStack.EMPTY));
 
       if (livingBase instanceof PlayerEntity) {
         ItemHandlerHelper.giveItemToPlayer((PlayerEntity) livingBase, copy);

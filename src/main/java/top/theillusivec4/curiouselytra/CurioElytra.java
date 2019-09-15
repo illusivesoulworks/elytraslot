@@ -20,6 +20,7 @@
 
 package top.theillusivec4.curiouselytra;
 
+import java.util.UUID;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
@@ -34,13 +35,11 @@ import top.theillusivec4.caelus.api.CaelusAPI;
 import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.capability.ICurio;
 
-import java.util.UUID;
-
 public class CurioElytra implements ICurio {
 
-  public static final AttributeModifier ELYTRA_CURIO_MODIFIER =
-      new AttributeModifier(UUID.fromString("c754faef-9926-4a77-abbe-e34ef0d735aa"),
-                            "Elytra curio modifier", 1.0D, AttributeModifier.Operation.ADDITION);
+  public static final AttributeModifier ELYTRA_CURIO_MODIFIER = new AttributeModifier(
+      UUID.fromString("c754faef-9926-4a77-abbe-e34ef0d735aa"), "Elytra curio modifier", 1.0D,
+      AttributeModifier.Operation.ADDITION);
 
   private ItemStack stack;
 
@@ -56,13 +55,12 @@ public class CurioElytra implements ICurio {
       return;
     }
 
-    Integer ticksFlying =
-        ObfuscationReflectionHelper.getPrivateValue(LivingEntity.class, entityLivingBase,
-                                                    "field_184629_bo");
+    Integer ticksFlying = ObfuscationReflectionHelper
+        .getPrivateValue(LivingEntity.class, entityLivingBase, "field_184629_bo");
 
     if (ticksFlying != null && (ticksFlying + 1) % 20 == 0) {
       stack.damageItem(1, entityLivingBase,
-                       entity -> entity.sendBreakAnimation(EquipmentSlotType.CHEST));
+          entity -> entity.sendBreakAnimation(EquipmentSlotType.CHEST));
     }
   }
 
@@ -70,8 +68,8 @@ public class CurioElytra implements ICurio {
   public boolean canEquip(String identifier, LivingEntity entityLivingBase) {
 
     return !(entityLivingBase.getItemStackFromSlot(EquipmentSlotType.CHEST)
-                             .getItem() instanceof ElytraItem) &&
-           !CuriosAPI.getCurioEquipped(Items.ELYTRA, entityLivingBase).isPresent();
+        .getItem() instanceof ElytraItem) && !CuriosAPI
+        .getCurioEquipped(Items.ELYTRA, entityLivingBase).isPresent();
   }
 
   @Override
@@ -93,9 +91,9 @@ public class CurioElytra implements ICurio {
   @Override
   public void playEquipSound(LivingEntity entityLivingBase) {
 
-    entityLivingBase.world.playSound(null, entityLivingBase.getPosition(),
-                                     SoundEvents.ITEM_ARMOR_EQUIP_ELYTRA, SoundCategory.NEUTRAL,
-                                     1.0F, 1.0F);
+    entityLivingBase.world
+        .playSound(null, entityLivingBase.getPosition(), SoundEvents.ITEM_ARMOR_EQUIP_ELYTRA,
+            SoundCategory.NEUTRAL, 1.0F, 1.0F);
   }
 
   @Override
