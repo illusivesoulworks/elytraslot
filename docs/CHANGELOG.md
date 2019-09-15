@@ -4,7 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project does not adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 This project uses MCVERSION-MAJORMOD.MAJORAPI.MINOR.PATCH.
 
-## [0.7](https://github.com/TheIllusiveC4/CuriousElytra/compare/fbf386293a78a35e5f5b360f36e859de4a920ba6...master) - 2019.07.24
+## [1.0](https://github.com/TheIllusiveC4/CuriousElytra/compare/181b52953ae9df98d9c1345fa55896090a633fe7...master) - 2019.09.15
+### Changed
+- Updated to Forge RB 28.1.0
+
+## [0.7](https://github.com/TheIllusiveC4/CuriousElytra/compare/fbf386293a78a35e5f5b360f36e859de4a920ba6...181b52953ae9df98d9c1345fa55896090a633fe7) - 2019.07.24
 ### Changed
 - Updated to 1.14.4 Forge
 
