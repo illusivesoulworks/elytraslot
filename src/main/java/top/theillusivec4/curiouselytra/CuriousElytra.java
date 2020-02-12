@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019  C4
+ * Copyright (c) 2019-2020 C4
  *
  * This file is part of Curious Elytra, a mod made for Minecraft.
  *
@@ -14,8 +14,7 @@
  * GNU Lesser General Public License for more details.
  *
  * You should have received a copy of the GNU Lesser General Public
- * License along with Curious Elytra.  If not, see <https://www.gnu
- * .org/licenses/>.
+ * License along with Curious Elytra.  If not, see <https://www.gnu.org/licenses/>.
  */
 
 package top.theillusivec4.curiouselytra;
