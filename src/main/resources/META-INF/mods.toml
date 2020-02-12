@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[28,)"
+loaderVersion="[31,)"
 issueTrackerURL="https://github.com/TheIllusiveC4/CuriousElytra/issues"
 logoFile="${mod_icon}"
 [[mods]]
@@ -14,24 +14,24 @@ ${mod_description}
 [[dependencies.curiouselytra]]
     modId="forge"
     mandatory=true
-    versionRange="[28.1.0,)"
+    versionRange="[31.1.0,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.curiouselytra]]
     modId="minecraft"
     mandatory=true
-    versionRange="[1.14.4,1.15)"
+    versionRange="[1.15.2,1.16)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.curiouselytra]]
     modId="caelus"
     mandatory=true
-    versionRange="[FORGE-1.14.4-1.0,)"
+    versionRange="[FORGE-1.15.2-2.0-beta1,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.curiouselytra]]
     modId="curios"
     mandatory=true
-    versionRange="[FORGE-1.14.4-1.0,)"
+    versionRange="[FORGE-1.15.2-2.0-beta2,)"
     ordering="NONE"
     side="BOTH"

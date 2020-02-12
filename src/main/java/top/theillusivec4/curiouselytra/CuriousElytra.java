@@ -20,6 +20,7 @@
 
 package top.theillusivec4.curiouselytra;
 
+import java.util.function.Function;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import net.minecraft.entity.LivingEntity;
@@ -41,7 +42,9 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.items.ItemHandlerHelper;
-import top.theillusivec4.caelus.api.event.RenderElytraEvent;
+import top.theillusivec4.caelus.api.CaelusAPI;
+import top.theillusivec4.caelus.api.CaelusAPI.ElytraRender;
+import top.theillusivec4.caelus.api.CaelusAPI.IMC;
 import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.capability.CuriosCapability;
 import top.theillusivec4.curios.api.capability.ICurio;
@@ -53,25 +56,28 @@ public class CuriousElytra {
   public static final String MODID = "curiouselytra";
 
   public CuriousElytra() {
-
     FMLJavaModLoadingContext.get().getModEventBus().addListener(this::enqueue);
     MinecraftForge.EVENT_BUS.register(this);
   }
 
   private void enqueue(final InterModEnqueueEvent evt) {
-
     InterModComms.sendTo("curios", CuriosAPI.IMC.REGISTER_TYPE, () -> new CurioIMCMessage("back"));
+    InterModComms.sendTo("caelus", IMC.ELYTRA_RENDER, () -> (Function<LivingEntity, ElytraRender>) (livingEntity) -> {
+      ElytraRender[] render = {ElytraRender.NONE};
+      CuriosAPI.getCurioEquipped(Items.ELYTRA, livingEntity).ifPresent(elytra -> {
+        render[0] = elytra.getRight().isEnchanted() ? ElytraRender.ENCHANTED : ElytraRender.NORMAL;
+      });
+      return render[0];
+    });
   }
 
   @SubscribeEvent
   public void attachCapabilities(AttachCapabilitiesEvent<ItemStack> evt) {
-
     ItemStack stack = evt.getObject();
 
     if (!(stack.getItem() instanceof ElytraItem)) {
       return;
     }
-
     CurioElytra curioElytra = new CurioElytra(stack);
     evt.addCapability(CuriosCapability.ID_ITEM, new ICapabilityProvider() {
       LazyOptional<ICurio> curio = LazyOptional.of(() -> curioElytra);
@@ -88,13 +94,11 @@ public class CuriousElytra {
 
   @SubscribeEvent
   public void onLivingEquipmentChange(LivingEquipmentChangeEvent evt) {
-
     ItemStack to = evt.getTo();
 
     if (evt.getSlot() != EquipmentSlotType.CHEST || !(to.getItem() instanceof ElytraItem)) {
       return;
     }
-
     LivingEntity livingBase = evt.getEntityLiving();
     CuriosAPI.getCurioEquipped(Items.ELYTRA, livingBase).ifPresent(elytra -> {
       ItemStack stack = elytra.getRight();
@@ -107,15 +111,6 @@ public class CuriousElytra {
       } else {
         livingBase.entityDropItem(copy);
       }
-    });
-  }
-
-  @SubscribeEvent
-  public void onRenderElytra(RenderElytraEvent evt) {
-
-    CuriosAPI.getCurioEquipped(Items.ELYTRA, evt.getEntityLiving()).ifPresent(elytra -> {
-      evt.setRenderElytra(true);
-      evt.setRenderEnchantmentGlow(elytra.getRight().isEnchanted());
     });
   }
 }

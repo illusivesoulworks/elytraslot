@@ -44,17 +44,15 @@ public class CurioElytra implements ICurio {
   private ItemStack stack;
 
   public CurioElytra(ItemStack stack) {
-
     this.stack = stack;
   }
 
   @Override
-  public void onCurioTick(String identifier, LivingEntity entityLivingBase) {
+  public void onCurioTick(String identifier, int index, LivingEntity entityLivingBase) {
 
     if (entityLivingBase.world.isRemote || !ElytraItem.isUsable(stack)) {
       return;
     }
-
     Integer ticksFlying = ObfuscationReflectionHelper
         .getPrivateValue(LivingEntity.class, entityLivingBase, "field_184629_bo");
 
@@ -66,7 +64,6 @@ public class CurioElytra implements ICurio {
 
   @Override
   public boolean canEquip(String identifier, LivingEntity entityLivingBase) {
-
     return !(entityLivingBase.getItemStackFromSlot(EquipmentSlotType.CHEST)
         .getItem() instanceof ElytraItem) && !CuriosAPI
         .getCurioEquipped(Items.ELYTRA, entityLivingBase).isPresent();
@@ -74,7 +71,6 @@ public class CurioElytra implements ICurio {
 
   @Override
   public void onEquipped(String identifier, LivingEntity entityLivingBase) {
-
     IAttributeInstance attributeInstance = entityLivingBase.getAttribute(CaelusAPI.ELYTRA_FLIGHT);
 
     if (!attributeInstance.hasModifier(ELYTRA_CURIO_MODIFIER) && ElytraItem.isUsable(stack)) {
@@ -84,13 +80,11 @@ public class CurioElytra implements ICurio {
 
   @Override
   public void onUnequipped(String identifier, LivingEntity entityLivingBase) {
-
     entityLivingBase.getAttribute(CaelusAPI.ELYTRA_FLIGHT).removeModifier(ELYTRA_CURIO_MODIFIER);
   }
 
   @Override
   public void playEquipSound(LivingEntity entityLivingBase) {
-
     entityLivingBase.world
         .playSound(null, entityLivingBase.getPosition(), SoundEvents.ITEM_ARMOR_EQUIP_ELYTRA,
             SoundCategory.NEUTRAL, 1.0F, 1.0F);
@@ -98,7 +92,6 @@ public class CurioElytra implements ICurio {
 
   @Override
   public boolean canRightClickEquip() {
-
     return true;
   }
 }
