@@ -19,13 +19,10 @@
 
 package top.theillusivec4.curiouselytra;
 
-import java.util.function.Function;
+import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ElytraItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.Direction;
@@ -34,20 +31,20 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.event.entity.living.LivingEquipmentChangeEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.items.ItemHandlerHelper;
-import top.theillusivec4.caelus.api.CaelusAPI;
-import top.theillusivec4.caelus.api.CaelusAPI.ElytraRender;
-import top.theillusivec4.caelus.api.CaelusAPI.IMC;
-import top.theillusivec4.curios.api.CuriosAPI;
-import top.theillusivec4.curios.api.capability.CuriosCapability;
-import top.theillusivec4.curios.api.capability.ICurio;
-import top.theillusivec4.curios.api.imc.CurioIMCMessage;
+import top.theillusivec4.caelus.api.RenderElytraEvent;
+import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.CuriosCapability;
+import top.theillusivec4.curios.api.SlotTypeMessage;
+import top.theillusivec4.curios.api.SlotTypePreset;
+import top.theillusivec4.curios.api.type.capability.ICurio;
+import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 
 @Mod(CuriousElytra.MODID)
 public class CuriousElytra {
@@ -55,26 +52,29 @@ public class CuriousElytra {
   public static final String MODID = "curiouselytra";
 
   public CuriousElytra() {
-    FMLJavaModLoadingContext.get().getModEventBus().addListener(this::enqueue);
-    MinecraftForge.EVENT_BUS.register(this);
+    IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
+    eventBus.addListener(this::enqueue);
+    eventBus.addListener(this::clientSetup);
+    eventBus.addListener(this::setup);
+  }
+
+  private void setup(final FMLCommonSetupEvent evt) {
+    MinecraftForge.EVENT_BUS.addGenericListener(ItemStack.class, this::attachCapabilities);
+  }
+
+  private void clientSetup(final FMLClientSetupEvent evt) {
+    MinecraftForge.EVENT_BUS.addListener(this::renderElytra);
   }
 
   private void enqueue(final InterModEnqueueEvent evt) {
-    InterModComms.sendTo("curios", CuriosAPI.IMC.REGISTER_TYPE, () -> new CurioIMCMessage("back"));
-    InterModComms.sendTo("caelus", IMC.ELYTRA_RENDER, () -> (Function<LivingEntity, ElytraRender>) (livingEntity) -> {
-      ElytraRender[] render = {ElytraRender.NONE};
-      CuriosAPI.getCurioEquipped(Items.ELYTRA, livingEntity).ifPresent(elytra -> {
-        render[0] = elytra.getRight().isEnchanted() ? ElytraRender.ENCHANTED : ElytraRender.NORMAL;
-      });
-      return render[0];
-    });
+    InterModComms.sendTo(CuriosApi.MODID, SlotTypeMessage.REGISTER_TYPE,
+        () -> SlotTypePreset.BACK.getMessageBuilder().build());
   }
 
-  @SubscribeEvent
-  public void attachCapabilities(AttachCapabilitiesEvent<ItemStack> evt) {
+  private void attachCapabilities(AttachCapabilitiesEvent<ItemStack> evt) {
     ItemStack stack = evt.getObject();
 
-    if (!(stack.getItem() instanceof ElytraItem)) {
+    if (stack.getItem() != Items.ELYTRA) {
       return;
     }
     CurioElytra curioElytra = new CurioElytra(stack);
@@ -85,30 +85,32 @@ public class CuriousElytra {
       @Override
       public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap,
           @Nullable Direction side) {
-
         return CuriosCapability.ITEM.orEmpty(cap, curio);
       }
     });
   }
 
-  @SubscribeEvent
-  public void onLivingEquipmentChange(LivingEquipmentChangeEvent evt) {
-    ItemStack to = evt.getTo();
+  private void renderElytra(RenderElytraEvent evt) {
+    PlayerEntity playerEntity = evt.getPlayer();
+    CuriosApi.getCuriosHelper().getCuriosHandler(playerEntity).ifPresent(handler -> {
+      Set<String> tags = CuriosApi.getCuriosHelper().getCurioTags(Items.ELYTRA);
 
-    if (evt.getSlot() != EquipmentSlotType.CHEST || !(to.getItem() instanceof ElytraItem)) {
-      return;
-    }
-    LivingEntity livingBase = evt.getEntityLiving();
-    CuriosAPI.getCurioEquipped(Items.ELYTRA, livingBase).ifPresent(elytra -> {
-      ItemStack stack = elytra.getRight();
-      ItemStack copy = stack.copy();
-      CuriosAPI.getCuriosHandler(livingBase).ifPresent(
-          handler -> handler.setStackInSlot(elytra.getLeft(), elytra.getMiddle(), ItemStack.EMPTY));
+      for (String id : tags) {
+        handler.getStacksHandler(id).ifPresent(stacksHandler -> {
+          IDynamicStackHandler stackHandler = stacksHandler.getStacks();
 
-      if (livingBase instanceof PlayerEntity) {
-        ItemHandlerHelper.giveItemToPlayer((PlayerEntity) livingBase, copy);
-      } else {
-        livingBase.entityDropItem(copy);
+          for (int i = 0; i < stackHandler.getSlots(); i++) {
+            ItemStack stack = stackHandler.getStackInSlot(i);
+
+            if (stack.getItem() == Items.ELYTRA && stacksHandler.getRenders().get(i)) {
+              evt.setRender(true);
+
+              if (stack.isEnchanted()) {
+                evt.setEnchanted(true);
+              }
+            }
+          }
+        });
       }
     });
   }

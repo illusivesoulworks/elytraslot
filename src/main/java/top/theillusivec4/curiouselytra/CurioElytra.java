@@ -22,17 +22,18 @@ package top.theillusivec4.curiouselytra;
 import java.util.UUID;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.IAttributeInstance;
+import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ElytraItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
-import top.theillusivec4.caelus.api.CaelusAPI;
-import top.theillusivec4.curios.api.CuriosAPI;
-import top.theillusivec4.curios.api.capability.ICurio;
+import top.theillusivec4.caelus.api.CaelusApi;
+import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.type.capability.ICurio;
 
 public class CurioElytra implements ICurio {
 
@@ -47,7 +48,7 @@ public class CurioElytra implements ICurio {
   }
 
   @Override
-  public void onCurioTick(String identifier, int index, LivingEntity entityLivingBase) {
+  public void curioTick(String identifier, int index, LivingEntity entityLivingBase) {
 
     if (entityLivingBase.world.isRemote || !ElytraItem.isUsable(stack)) {
       return;
@@ -64,29 +65,35 @@ public class CurioElytra implements ICurio {
   @Override
   public boolean canEquip(String identifier, LivingEntity entityLivingBase) {
     return !(entityLivingBase.getItemStackFromSlot(EquipmentSlotType.CHEST)
-        .getItem() instanceof ElytraItem) && !CuriosAPI
-        .getCurioEquipped(Items.ELYTRA, entityLivingBase).isPresent();
+        .getItem() instanceof ElytraItem) && !CuriosApi.getCuriosHelper()
+        .findEquippedCurio(Items.ELYTRA, entityLivingBase).isPresent();
   }
 
   @Override
-  public void onEquipped(String identifier, LivingEntity entityLivingBase) {
-    IAttributeInstance attributeInstance = entityLivingBase.getAttribute(CaelusAPI.ELYTRA_FLIGHT);
+  public void onEquip(String identifier, int index, LivingEntity entityLivingBase) {
+    ModifiableAttributeInstance attributeInstance = entityLivingBase
+        .getAttribute(CaelusApi.ELYTRA_FLIGHT.get());
 
-    if (!attributeInstance.hasModifier(ELYTRA_CURIO_MODIFIER) && ElytraItem.isUsable(stack)) {
-      attributeInstance.applyModifier(ELYTRA_CURIO_MODIFIER);
+    if (attributeInstance != null && !attributeInstance.hasModifier(ELYTRA_CURIO_MODIFIER)
+        && ElytraItem.isUsable(stack)) {
+      attributeInstance.func_233767_b_(ELYTRA_CURIO_MODIFIER);
     }
   }
 
   @Override
-  public void onUnequipped(String identifier, LivingEntity entityLivingBase) {
-    entityLivingBase.getAttribute(CaelusAPI.ELYTRA_FLIGHT).removeModifier(ELYTRA_CURIO_MODIFIER);
+  public void onUnequip(String identifier, int index, LivingEntity livingEntity) {
+    ModifiableAttributeInstance attributeInstance = livingEntity
+        .getAttribute(CaelusApi.ELYTRA_FLIGHT.get());
+
+    if (attributeInstance != null) {
+      attributeInstance.removeModifier(ELYTRA_CURIO_MODIFIER);
+    }
   }
 
   @Override
-  public void playEquipSound(LivingEntity entityLivingBase) {
-    entityLivingBase.world
-        .playSound(null, entityLivingBase.getPosition(), SoundEvents.ITEM_ARMOR_EQUIP_ELYTRA,
-            SoundCategory.NEUTRAL, 1.0F, 1.0F);
+  public void playRightClickEquipSound(LivingEntity livingEntity) {
+    livingEntity.world.playSound(null, new BlockPos(livingEntity.getPositionVec()),
+        SoundEvents.ITEM_ARMOR_EQUIP_ELYTRA, SoundCategory.NEUTRAL, 1.0F, 1.0F);
   }
 
   @Override
