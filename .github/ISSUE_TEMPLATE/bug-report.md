@@ -15,7 +15,7 @@ Please reproduce all issues without any other unnecessary mods before submitting
 * Curious Elytra:
 * Caelus:
 * Curios:
-* Forge:
+* Forge/Fabric:
 #### Observed Behavior:
 #### Expected Behavior:
 #### Steps to Reproduce:
