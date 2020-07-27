@@ -78,6 +78,7 @@ curseforge {
 
         relations {
             requiredDependency 'curios-fabric'
+            requiredDependency 'caelus-fabric'
         }
 
         afterEvaluate {
