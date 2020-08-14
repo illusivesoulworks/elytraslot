@@ -13,9 +13,9 @@ buildscript {
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'com.matthewprenger.cursegradle'
 
-version = "${version_minecraft}-${mod_version}"
+version = "${mod_version}"
 group = "${mod_group}"
-archivesBaseName = "${mod_id}"
+archivesBaseName = "${mod_id}-forge"
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
 
@@ -59,8 +59,8 @@ repositories {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${version_forge}"
-    compile fg.deobf("top.theillusivec4.curios:curios:${version_curios}")
-    compile fg.deobf("top.theillusivec4.caelus:caelus:${version_caelus}")
+    compile fg.deobf("top.theillusivec4.curios:curios-forge:${version_curios}")
+    compile fg.deobf("top.theillusivec4.caelus:caelus-forge:${version_caelus}")
 }
 
 sourceSets {
@@ -75,16 +75,16 @@ jar {
     manifest {
         attributes(["Specification-Title": "${mod_name}",
                     "Specification-Vendor": "${mod_author}",
-                    "Specification-Version": "${version}",
+                    "Specification-Version": "${getArchiveVersion()}",
                     "Implementation-Title": "${mod_name}",
-                    "Implementation-Version": "${version}",
+                    "Implementation-Version": "${getArchiveVersion()}",
                     "Implementation-Vendor" :"${mod_author}",
                     "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")],)
     }
 }
 
 task sourcesJar(type: Jar) {
-    classifier = 'sources'
+    archiveClassifier.set('sources')
     from sourceSets.main.allJava
 }
 

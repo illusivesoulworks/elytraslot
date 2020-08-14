@@ -76,7 +76,7 @@ public class CurioElytra implements ICurio {
 
     if (attributeInstance != null && !attributeInstance.hasModifier(ELYTRA_CURIO_MODIFIER)
         && ElytraItem.isUsable(stack)) {
-      attributeInstance.func_233767_b_(ELYTRA_CURIO_MODIFIER);
+      attributeInstance.applyNonPersistentModifier(ELYTRA_CURIO_MODIFIER);
     }
   }
 
