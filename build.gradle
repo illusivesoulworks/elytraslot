@@ -31,6 +31,8 @@ dependencies {
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
     modImplementation "top.theillusivec4.curios:curios-fabric:${project.curios_version}"
     modImplementation "top.theillusivec4.caelus:caelus-fabric:${project.caelus_version}"
+
+    include "top.theillusivec4.caelus:caelus-fabric:${project.caelus_version}"
 }
 
 processResources {
@@ -78,7 +80,7 @@ curseforge {
 
         relations {
             requiredDependency 'curios-fabric'
-            requiredDependency 'caelus-fabric'
+            embeddedLibrary 'caelus-fabric'
         }
 
         afterEvaluate {
