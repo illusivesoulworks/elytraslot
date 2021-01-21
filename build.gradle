@@ -55,12 +55,19 @@ repositories {
     maven {
         url = "https://maven.theillusivec4.top/"
     }
+    maven {
+        name = "CurseMaven"
+        url = "https://www.cursemaven.com"
+    }
 }
 
 dependencies {
     minecraft "net.minecraftforge:forge:${version_forge}"
     compile fg.deobf("top.theillusivec4.curios:curios-forge:${version_curios}")
     compile fg.deobf("top.theillusivec4.caelus:caelus-forge:${version_caelus}")
+
+    compileOnly fg.deobf("curse.maven:enderitemod-401284:3098797")
+    compileOnly fg.deobf("curse.maven:netheriteplus-394120:3175587")
 }
 
 sourceSets {
@@ -116,5 +123,8 @@ curseforge {
             requiredDependency 'caelus'
         }
         addArtifact(sourcesJar)
+        "${curse_versions}".split(',').each {
+            addGameVersion "${it}"
+        }
     }
 }

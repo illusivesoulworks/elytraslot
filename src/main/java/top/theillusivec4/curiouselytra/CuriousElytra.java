@@ -23,9 +23,11 @@ import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ElytraItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.Direction;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -33,11 +35,13 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.InterModComms;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import top.theillusivec4.caelus.api.CaelusApi;
 import top.theillusivec4.caelus.api.RenderElytraEvent;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.CuriosCapability;
@@ -45,17 +49,21 @@ import top.theillusivec4.curios.api.SlotTypeMessage;
 import top.theillusivec4.curios.api.SlotTypePreset;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
+import top.theillusivec4.curiouselytra.integration.NetheritePlusIntegration;
 
 @Mod(CuriousElytra.MODID)
 public class CuriousElytra {
 
   public static final String MODID = "curiouselytra";
 
+  public static boolean isNetheritePlusLoaded = false;
+
   public CuriousElytra() {
     IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
     eventBus.addListener(this::enqueue);
     eventBus.addListener(this::clientSetup);
     eventBus.addListener(this::setup);
+    isNetheritePlusLoaded = ModList.get().isLoaded("netherite_plus");
   }
 
   private void setup(final FMLCommonSetupEvent evt) {
@@ -74,20 +82,20 @@ public class CuriousElytra {
   private void attachCapabilities(AttachCapabilitiesEvent<ItemStack> evt) {
     ItemStack stack = evt.getObject();
 
-    if (stack.getItem() != Items.ELYTRA) {
-      return;
-    }
-    CurioElytra curioElytra = new CurioElytra(stack);
-    evt.addCapability(CuriosCapability.ID_ITEM, new ICapabilityProvider() {
-      LazyOptional<ICurio> curio = LazyOptional.of(() -> curioElytra);
+    if (stack.getItem() instanceof ElytraItem ||
+        (isNetheritePlusLoaded && NetheritePlusIntegration.isNetheriteElytra(stack.getItem()))) {
+      CurioElytra curioElytra = new CurioElytra(stack);
+      evt.addCapability(CuriosCapability.ID_ITEM, new ICapabilityProvider() {
+        LazyOptional<ICurio> curio = LazyOptional.of(() -> curioElytra);
 
-      @Nonnull
-      @Override
-      public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap,
-          @Nullable Direction side) {
-        return CuriosCapability.ITEM.orEmpty(cap, curio);
-      }
-    });
+        @Nonnull
+        @Override
+        public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap,
+                                                 @Nullable Direction side) {
+          return CuriosCapability.ITEM.orEmpty(cap, curio);
+        }
+      });
+    }
   }
 
   private void renderElytra(RenderElytraEvent evt) {
@@ -102,8 +110,20 @@ public class CuriousElytra {
           for (int i = 0; i < stackHandler.getSlots(); i++) {
             ItemStack stack = stackHandler.getStackInSlot(i);
 
-            if (stack.getItem() == Items.ELYTRA && stacksHandler.getRenders().get(i)) {
+            if (CaelusApi.isElytra(stack) && stacksHandler.getRenders().get(i)) {
               evt.setRender(true);
+              ResourceLocation rl = stack.getItem().getRegistryName();
+
+              if (rl != null) {
+
+                if (rl.equals(new ResourceLocation("enderitemod:enderite_elytra_seperated"))) {
+                  evt.setResourceLocation(
+                      new ResourceLocation("minecraft:textures/entity/enderite_elytra.png"));
+                } else if (rl.equals(new ResourceLocation("netherite_plus:netherite_elytra"))) {
+                  evt.setResourceLocation(
+                      new ResourceLocation("netherite_plus:textures/entity/netherite_elytra.png"));
+                }
+              }
 
               if (stack.isEnchanted()) {
                 evt.setEnchanted(true);

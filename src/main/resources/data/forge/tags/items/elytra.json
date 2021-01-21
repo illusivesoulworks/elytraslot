@@ -1,8 +1,6 @@
 {
   "replace": false,
-  "values": [
-    "minecraft:elytra"
-  ],
+  "values": [],
   "optional": [
     "enderitemod:enderite_elytra_seperated",
     "netherite_plus:netherite_elytra"

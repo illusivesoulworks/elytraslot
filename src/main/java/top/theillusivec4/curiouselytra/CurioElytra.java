@@ -26,7 +26,6 @@ import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ElytraItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.BlockPos;
@@ -66,7 +65,8 @@ public class CurioElytra implements ICurio {
   public boolean canEquip(String identifier, LivingEntity entityLivingBase) {
     return !(entityLivingBase.getItemStackFromSlot(EquipmentSlotType.CHEST)
         .getItem() instanceof ElytraItem) && !CuriosApi.getCuriosHelper()
-        .findEquippedCurio(Items.ELYTRA, entityLivingBase).isPresent();
+        .findEquippedCurio(CaelusApi::isElytra, entityLivingBase)
+        .isPresent();
   }
 
   @Override
@@ -75,7 +75,7 @@ public class CurioElytra implements ICurio {
         .getAttribute(CaelusApi.ELYTRA_FLIGHT.get());
 
     if (attributeInstance != null && !attributeInstance.hasModifier(ELYTRA_CURIO_MODIFIER)
-        && ElytraItem.isUsable(stack)) {
+        && (stack.canElytraFly(entityLivingBase) || CaelusApi.isElytra(stack))) {
       attributeInstance.applyNonPersistentModifier(ELYTRA_CURIO_MODIFIER);
     }
   }
