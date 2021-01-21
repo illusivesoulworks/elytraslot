@@ -1,7 +1,6 @@
 {
   "replace": false,
   "values": [
-    "minecraft:elytra",
     {
       "id": "enderitemod:enderite_elytra_seperated",
       "required": false

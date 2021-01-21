@@ -26,7 +26,6 @@ import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributeModifier;
 import net.minecraft.item.ElytraItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import top.theillusivec4.caelus.api.CaelusApi;
@@ -62,8 +61,8 @@ public class CurioElytra implements ICurio {
   @Override
   public boolean canEquip(String identifier, LivingEntity entityLivingBase) {
     return !(entityLivingBase.getEquippedStack(EquipmentSlot.CHEST).getItem() instanceof ElytraItem)
-        && !CuriosApi.getCuriosHelper().findEquippedCurio(Items.ELYTRA, entityLivingBase)
-        .isPresent();
+        && !CuriosApi.getCuriosHelper().findEquippedCurio((stack) -> CaelusApi.getInstance()
+        .isElytra(stack.getItem()), entityLivingBase).isPresent();
   }
 
   @Override

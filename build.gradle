@@ -21,6 +21,10 @@ repositories {
 		name = "Ladysnake Libs"
 		url = 'https://dl.bintray.com/ladysnake/libs'
     }
+    maven {
+        name = "CurseMaven"
+        url = 'https://www.cursemaven.com'
+    }
 }
 
 dependencies {
@@ -33,6 +37,12 @@ dependencies {
     modImplementation "top.theillusivec4.caelus:caelus-fabric:${project.caelus_version}"
 
     include "top.theillusivec4.caelus:caelus-fabric:${project.caelus_version}"
+
+    modCompileOnly "curse.maven:enderite-399221:3040717"
+    modRuntime "curse.maven:enderite-399221:3040717"
+
+    modCompileOnly "curse.maven:netheriteplus-394120:3173169"
+//	modRuntime "curse.maven:netheriteplus-394120:3173169"
 }
 
 processResources {

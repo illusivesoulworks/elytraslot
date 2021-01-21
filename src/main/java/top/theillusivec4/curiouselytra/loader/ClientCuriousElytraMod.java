@@ -24,6 +24,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import net.fabricmc.api.ClientModInitializer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.registry.Registry;
+import top.theillusivec4.caelus.api.CaelusApi;
 import top.theillusivec4.caelus.api.event.RenderElytraCallback;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
@@ -44,9 +47,16 @@ public class ClientCuriousElytraMod implements ClientModInitializer {
 
                   for (int i = 0; i < stackHandler.size(); i++) {
                     ItemStack stack = stackHandler.getStack(i);
+                    Identifier itemId = Registry.ITEM.getId(stack.getItem());
 
-                    if (stack.getItem() == Items.ELYTRA && stacksHandler.getRenders().get(i)) {
+                    if (CaelusApi.getInstance().isElytra(stack.getItem()) && stacksHandler.getRenders().get(i)) {
                       renderElytraInfo.activateRender();
+
+                      if (itemId.equals(new Identifier("enderitemod:enderite_elytra_seperated"))) {
+                        renderElytraInfo.setTextureOverride(new Identifier("minecraft:textures/entity/enderite_elytra.png"));
+                      } else if (itemId.equals(new Identifier("netherite_plus:netherite_elytra"))) {
+                        renderElytraInfo.setTextureOverride(new Identifier("netherite_plus:textures/entity/netherite_elytra.png"));
+                      }
 
                       if (stack.hasGlint()) {
                         renderElytraInfo.activateGlow();

@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [1.1.1-1.16.5] - 2021.01.20
+### Added
+- Added Netherite Plus integration [#10](https://github.com/TheIllusiveC4/CuriousElytra/issues/10)
+- Added Enderite Mod integration [#10](https://github.com/TheIllusiveC4/CuriousElytra/issues/10)
+### Changed
+- Updated to 1.16.5
+
 ## [1.1.0-1.16.3] - 2020.09.26
 ### Changed
 - Updated to 1.16.3
