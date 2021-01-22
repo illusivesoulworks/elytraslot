@@ -27,7 +27,7 @@ ${mod_description}
 [[dependencies.curiouselytra]]
     modId="caelus"
     mandatory=true
-    versionRange="[1.16.3-2.0.0.2,)"
+    versionRange="[1.16.5-2.1.2.2,)"
     ordering="NONE"
     side="BOTH"
 [[dependencies.curiouselytra]]

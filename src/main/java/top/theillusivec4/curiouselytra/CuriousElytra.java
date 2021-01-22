@@ -50,6 +50,7 @@ import top.theillusivec4.curios.api.SlotTypePreset;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 import top.theillusivec4.curiouselytra.integration.NetheritePlusIntegration;
+import top.theillusivec4.curiouselytra.integration.SilentGearIntegration;
 
 @Mod(CuriousElytra.MODID)
 public class CuriousElytra {
@@ -57,6 +58,7 @@ public class CuriousElytra {
   public static final String MODID = "curiouselytra";
 
   public static boolean isNetheritePlusLoaded = false;
+  public static boolean isSilentGearLoaded = false;
 
   public CuriousElytra() {
     IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -64,6 +66,7 @@ public class CuriousElytra {
     eventBus.addListener(this::clientSetup);
     eventBus.addListener(this::setup);
     isNetheritePlusLoaded = ModList.get().isLoaded("netherite_plus");
+    isSilentGearLoaded = ModList.get().isLoaded("silentgear");
   }
 
   private void setup(final FMLCommonSetupEvent evt) {
@@ -122,6 +125,9 @@ public class CuriousElytra {
                 } else if (rl.equals(new ResourceLocation("netherite_plus:netherite_elytra"))) {
                   evt.setResourceLocation(
                       new ResourceLocation("netherite_plus:textures/entity/netherite_elytra.png"));
+                } else if (isSilentGearLoaded && SilentGearIntegration.isSilentGearElytra(stack)) {
+                  evt.setResourceLocation(SilentGearIntegration.getElytraTexture());
+                  evt.setColor(SilentGearIntegration.getElytraColor(stack));
                 }
               }
 

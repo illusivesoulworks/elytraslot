@@ -25,6 +25,7 @@ minecraft {
     runs {
         client {
             workingDirectory project.file('run')
+            jvmArg "-Dmixin.env.disableRefMap=true"
 
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
@@ -38,6 +39,7 @@ minecraft {
 
         server {
             workingDirectory project.file('run')
+            jvmArg "-Dmixin.env.disableRefMap=true"
 
             property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
             property 'forge.logging.console.level', 'debug'
@@ -65,9 +67,12 @@ dependencies {
     minecraft "net.minecraftforge:forge:${version_forge}"
     compile fg.deobf("top.theillusivec4.curios:curios-forge:${version_curios}")
     compile fg.deobf("top.theillusivec4.caelus:caelus-forge:${version_caelus}")
+    compile fg.deobf("curse.maven:silentgear-297039:3171732")
 
     compileOnly fg.deobf("curse.maven:enderitemod-401284:3098797")
     compileOnly fg.deobf("curse.maven:netheriteplus-394120:3175587")
+
+    runtimeOnly fg.deobf("curse.maven:silentlib-242998:3165746")
 }
 
 sourceSets {
