@@ -75,7 +75,7 @@ public class CurioElytra implements ICurio {
         .getAttribute(CaelusApi.ELYTRA_FLIGHT.get());
 
     if (attributeInstance != null && !attributeInstance.hasModifier(ELYTRA_CURIO_MODIFIER)
-        && (stack.canElytraFly(entityLivingBase) || CaelusApi.isElytra(stack))) {
+        && CaelusApi.canElytraFly(entityLivingBase, this.stack)) {
       attributeInstance.applyNonPersistentModifier(ELYTRA_CURIO_MODIFIER);
     }
   }

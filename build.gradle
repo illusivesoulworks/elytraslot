@@ -67,7 +67,7 @@ dependencies {
     minecraft "net.minecraftforge:forge:${version_forge}"
     compile fg.deobf("top.theillusivec4.curios:curios-forge:${version_curios}")
     compile fg.deobf("top.theillusivec4.caelus:caelus-forge:${version_caelus}")
-    compile fg.deobf("curse.maven:silentgear-297039:3171732")
+    compile fg.deobf("curse.maven:silentgear-297039:3221852")
 
     compileOnly fg.deobf("curse.maven:enderitemod-401284:3098797")
     compileOnly fg.deobf("curse.maven:netheriteplus-394120:3175587")
