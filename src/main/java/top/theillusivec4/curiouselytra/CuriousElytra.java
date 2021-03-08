@@ -148,6 +148,9 @@ public class CuriousElytra {
                 } else if (isSilentGearLoaded && SilentGearIntegration.isSilentGearElytra(stack)) {
                   evt.setResourceLocation(SilentGearIntegration.getElytraTexture());
                   evt.setColor(SilentGearIntegration.getElytraColor(stack));
+                } else if (rl.equals(new ResourceLocation("mana-and-artifice:spectral_elytra"))) {
+                  evt.setResourceLocation(new ResourceLocation("mana-and-artifice:textures/entity/elytra.png"));
+                  evt.setEnchanted(true);
                 }
               }
 

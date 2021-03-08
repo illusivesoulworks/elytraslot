@@ -50,7 +50,7 @@ public class CurioElytra implements ICurio {
     Integer ticksFlying = ObfuscationReflectionHelper
         .getPrivateValue(LivingEntity.class, entityLivingBase, "field_184629_bo");
 
-    if (ticksFlying != null) {
+    if (ticksFlying != null && entityLivingBase.isElytraFlying()) {
       this.stack.elytraFlightTick(entityLivingBase, ticksFlying);
     }
   }
