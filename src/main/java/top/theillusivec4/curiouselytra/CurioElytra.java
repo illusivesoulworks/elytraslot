@@ -22,7 +22,6 @@ package top.theillusivec4.curiouselytra;
 import java.util.UUID;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ElytraItem;
 import net.minecraft.item.ItemStack;
@@ -40,7 +39,7 @@ public class CurioElytra implements ICurio {
       UUID.fromString("c754faef-9926-4a77-abbe-e34ef0d735aa"), "Elytra curio modifier", 1.0D,
       AttributeModifier.Operation.ADDITION);
 
-  private ItemStack stack;
+  private final ItemStack stack;
 
   public CurioElytra(ItemStack stack) {
     this.stack = stack;
@@ -48,16 +47,11 @@ public class CurioElytra implements ICurio {
 
   @Override
   public void curioTick(String identifier, int index, LivingEntity entityLivingBase) {
-
-    if (entityLivingBase.world.isRemote || !ElytraItem.isUsable(stack)) {
-      return;
-    }
     Integer ticksFlying = ObfuscationReflectionHelper
         .getPrivateValue(LivingEntity.class, entityLivingBase, "field_184629_bo");
 
-    if (ticksFlying != null && (ticksFlying + 1) % 20 == 0) {
-      stack.damageItem(1, entityLivingBase,
-          entity -> entity.sendBreakAnimation(EquipmentSlotType.CHEST));
+    if (ticksFlying != null) {
+      this.stack.elytraFlightTick(entityLivingBase, ticksFlying);
     }
   }
 
@@ -67,27 +61,6 @@ public class CurioElytra implements ICurio {
         .getItem() instanceof ElytraItem) && !CuriosApi.getCuriosHelper()
         .findEquippedCurio(CaelusApi::isElytra, entityLivingBase)
         .isPresent();
-  }
-
-  @Override
-  public void onEquip(String identifier, int index, LivingEntity entityLivingBase) {
-    ModifiableAttributeInstance attributeInstance = entityLivingBase
-        .getAttribute(CaelusApi.ELYTRA_FLIGHT.get());
-
-    if (attributeInstance != null && !attributeInstance.hasModifier(ELYTRA_CURIO_MODIFIER)
-        && CaelusApi.canElytraFly(entityLivingBase, this.stack)) {
-      attributeInstance.applyNonPersistentModifier(ELYTRA_CURIO_MODIFIER);
-    }
-  }
-
-  @Override
-  public void onUnequip(String identifier, int index, LivingEntity livingEntity) {
-    ModifiableAttributeInstance attributeInstance = livingEntity
-        .getAttribute(CaelusApi.ELYTRA_FLIGHT.get());
-
-    if (attributeInstance != null) {
-      attributeInstance.removeModifier(ELYTRA_CURIO_MODIFIER);
-    }
   }
 
   @Override

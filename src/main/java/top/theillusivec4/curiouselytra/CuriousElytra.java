@@ -22,6 +22,7 @@ package top.theillusivec4.curiouselytra;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ElytraItem;
 import net.minecraft.item.ItemStack;
@@ -33,6 +34,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.ModList;
@@ -71,6 +73,7 @@ public class CuriousElytra {
 
   private void setup(final FMLCommonSetupEvent evt) {
     MinecraftForge.EVENT_BUS.addGenericListener(ItemStack.class, this::attachCapabilities);
+    MinecraftForge.EVENT_BUS.addListener(this::playerTick);
   }
 
   private void clientSetup(final FMLClientSetupEvent evt) {
@@ -82,26 +85,43 @@ public class CuriousElytra {
         () -> SlotTypePreset.BACK.getMessageBuilder().build());
   }
 
-  private void attachCapabilities(AttachCapabilitiesEvent<ItemStack> evt) {
+  private void playerTick(final TickEvent.PlayerTickEvent evt) {
+    PlayerEntity player = evt.player;
+    ModifiableAttributeInstance attributeInstance =
+        player.getAttribute(CaelusApi.ELYTRA_FLIGHT.get());
+
+    if (attributeInstance != null) {
+      attributeInstance.removeModifier(CurioElytra.ELYTRA_CURIO_MODIFIER);
+
+      if (!attributeInstance.hasModifier(CurioElytra.ELYTRA_CURIO_MODIFIER)) {
+        CuriosApi.getCuriosHelper()
+            .findEquippedCurio((stack) -> CaelusApi.canElytraFly(player, stack), player)
+            .ifPresent(triple -> attributeInstance
+                .applyNonPersistentModifier(CurioElytra.ELYTRA_CURIO_MODIFIER));
+      }
+    }
+  }
+
+  private void attachCapabilities(final AttachCapabilitiesEvent<ItemStack> evt) {
     ItemStack stack = evt.getObject();
 
     if (stack.getItem() instanceof ElytraItem ||
         (isNetheritePlusLoaded && NetheritePlusIntegration.isNetheriteElytra(stack.getItem()))) {
-      CurioElytra curioElytra = new CurioElytra(stack);
+      final LazyOptional<ICurio> elytraCurio = LazyOptional.of(() -> new CurioElytra(stack));
       evt.addCapability(CuriosCapability.ID_ITEM, new ICapabilityProvider() {
-        LazyOptional<ICurio> curio = LazyOptional.of(() -> curioElytra);
 
         @Nonnull
         @Override
         public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap,
                                                  @Nullable Direction side) {
-          return CuriosCapability.ITEM.orEmpty(cap, curio);
+          return CuriosCapability.ITEM.orEmpty(cap, elytraCurio);
         }
       });
+      evt.addListener(elytraCurio::invalidate);
     }
   }
 
-  private void renderElytra(RenderElytraEvent evt) {
+  private void renderElytra(final RenderElytraEvent evt) {
     PlayerEntity playerEntity = evt.getPlayer();
     CuriosApi.getCuriosHelper().getCuriosHandler(playerEntity).ifPresent(handler -> {
       Set<String> tags = CuriosApi.getCuriosHelper().getCurioTags(Items.ELYTRA);
