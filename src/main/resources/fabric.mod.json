@@ -1,33 +1,30 @@
 {
   "schemaVersion": 1,
-  "id": "curiouselytra",
+  "id": "elytratrinket",
   "version": "${version}",
-  "name": "Curious Elytra",
-  "description": "Adds curio support to the elytra so you can fly and wear chest armor at the same time.",
+  "name": "Elytra Trinket",
+  "description": "Adds trinket support to the elytra so you can fly and wear chest armor at the same time.",
   "authors": ["C4"],
   "contact": {
-    "homepage": "https://www.curseforge.com/minecraft/mc-mods/curious-elytra-fabric",
-    "sources": "https://github.com/TheIllusiveC4/CuriousElytra",
-    "issues": "https://github.com/TheIllusiveC4/CuriousElytra/issues"
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/elytra-trinket",
+    "sources": "https://github.com/TheIllusiveC4/ElytraTrinket",
+    "issues": "https://github.com/TheIllusiveC4/ElytraTrinket/issues"
   },
   "license": "LGPL-3.0-or-later",
-  "icon": "assets/curiouselytra/curiouselytra_icon.png",
+  "icon": "assets/elytratrinket/elytratrinket_icon.png",
   "environment": "*",
   "entrypoints": {
     "main": [
-      "top.theillusivec4.curiouselytra.loader.CuriousElytraMod"
-    ],
-    "client": [
-      "top.theillusivec4.curiouselytra.loader.ClientCuriousElytraMod"
+      "top.theillusivec4.elytratrinket.ElytraTrinketMod"
     ]
   },
   "mixins": [
-    "curiouselytra.mixins.json"
+    "elytratrinket.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.7.4",
-    "minecraft": "1.16.x",
-    "curios": "*",
+    "fabricloader": ">=0.11.3",
+    "minecraft": "1.17.x",
+    "trinkets": "*",
     "caelus": "*"
   }
 }

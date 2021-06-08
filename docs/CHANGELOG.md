@@ -3,6 +3,14 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [2.0.0-1.17] - 2021.06.08
+### Changed
+- Updated to Minecraft 1.17
+- Migrated to Trinkets API
+- Changed name from "Curious Elytra" to "Elytra Trinket"
+### Removed
+- Temporarily removed mod integrations
+
 ## [1.1.1-1.16.5] - 2021.01.20
 ### Added
 - Added Netherite Plus integration [#10](https://github.com/TheIllusiveC4/CuriousElytra/issues/10)

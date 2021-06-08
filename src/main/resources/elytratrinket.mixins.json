@@ -1,10 +1,10 @@
 {
   "required": true,
   "minVersion": "0.8",
-  "package": "top.theillusivec4.curiouselytra.loader.mixin",
-  "compatibilityLevel": "JAVA_8",
+  "package": "top.theillusivec4.elytratrinket.mixin",
+  "compatibilityLevel": "JAVA_16",
   "mixins": [
-    "LivingEntityAccessor"
+    "AccessorLivingEntity"
   ],
   "client": [],
   "server": [],

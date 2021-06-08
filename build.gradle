@@ -1,10 +1,10 @@
 plugins {
-    id 'fabric-loom' version '0.4-SNAPSHOT'
+    id 'fabric-loom' version '0.8-SNAPSHOT'
     id 'com.matthewprenger.cursegradle' version '1.4.0'
 }
 
-sourceCompatibility = JavaVersion.VERSION_1_8
-targetCompatibility = JavaVersion.VERSION_1_8
+sourceCompatibility = JavaVersion.VERSION_16
+targetCompatibility = JavaVersion.VERSION_16
 
 archivesBaseName = project.archives_base_name
 version = project.mod_version
@@ -18,12 +18,16 @@ repositories {
         url = "https://maven.theillusivec4.top/"
     }
     maven {
-		name = "Ladysnake Libs"
-		url = 'https://dl.bintray.com/ladysnake/libs'
+        name = 'Ladysnake Mods'
+        url = 'https://ladysnake.jfrog.io/artifactory/mods'
     }
+//    maven {
+//        name = "CurseMaven"
+//        url = 'https://www.cursemaven.com'
+//    }
     maven {
-        name = "CurseMaven"
-        url = 'https://www.cursemaven.com'
+        name = "TerraformersMC"
+        url = "https://maven.terraformersmc.com/"
     }
 }
 
@@ -33,38 +37,33 @@ dependencies {
 
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-    modImplementation "top.theillusivec4.curios:curios-fabric:${project.curios_version}"
+    modImplementation "dev.emi:trinkets:${trinkets_version}"
     modImplementation "top.theillusivec4.caelus:caelus-fabric:${project.caelus_version}"
 
     include "top.theillusivec4.caelus:caelus-fabric:${project.caelus_version}"
 
-    modCompileOnly "curse.maven:enderite-399221:3040717"
-    modRuntime "curse.maven:enderite-399221:3040717"
-
-    modCompileOnly "curse.maven:netheriteplus-394120:3173169"
-//	modRuntime "curse.maven:netheriteplus-394120:3173169"
+//    modCompileOnly "curse.maven:enderite-399221:3040717"
+//    modRuntime "curse.maven:enderite-399221:3040717"
+//
+//    modCompileOnly "curse.maven:netheriteplus-394120:3173169"
+//	  modRuntime "curse.maven:netheriteplus-394120:3173169"
 }
 
 processResources {
     inputs.property "version", project.version
 
-    from(sourceSets.main.resources.srcDirs) {
-        include "fabric.mod.json"
-        expand 'version': project.version
-    }
-
-    from(sourceSets.main.resources.srcDirs) {
-        exclude "fabric.mod.json"
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
     }
 }
 
-tasks.withType(JavaCompile) {
-    options.encoding = "UTF-8"
+tasks.withType(JavaCompile).configureEach {
+    it.options.encoding = "UTF-8"
+    it.options.release = 16
 }
 
-task sourcesJar(type: Jar, dependsOn: classes) {
-    archiveClassifier.set("sources")
-    from sourceSets.main.allSource
+java {
+    withSourcesJar()
 }
 
 sourceSets {
@@ -82,7 +81,7 @@ curseforge {
         releaseType = "${curse_release}"
         changelogType = 'markdown'
         changelog = file('docs/CHANGELOG.md')
-        addGameVersion "Java 8"
+        addGameVersion "Java 16"
         addGameVersion "Fabric"
         "${curse_versions}".split(',').each {
             addGameVersion "${it}"
@@ -91,7 +90,7 @@ curseforge {
         mainArtifact(file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar"))
 
         relations {
-            requiredDependency 'curios-fabric'
+            requiredDependency 'trinkets-fabric'
             embeddedLibrary 'caelus-fabric'
         }
 
