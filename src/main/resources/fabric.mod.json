@@ -16,6 +16,9 @@
   "entrypoints": {
     "main": [
       "top.theillusivec4.elytratrinket.ElytraTrinketMod"
+    ],
+    "client": [
+      "top.theillusivec4.elytratrinket.client.ElytraTrinketClientMod"
     ]
   },
   "mixins": [
