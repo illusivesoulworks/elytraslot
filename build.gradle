@@ -73,6 +73,8 @@ dependencies {
     compileOnly fg.deobf("curse.maven:netheriteplus-394120:3175587")
 
     runtimeOnly fg.deobf("curse.maven:silentlib-242998:3165746")
+
+    compileOnly fileTree(dir: 'libs', include: '*.jar')
 }
 
 sourceSets {

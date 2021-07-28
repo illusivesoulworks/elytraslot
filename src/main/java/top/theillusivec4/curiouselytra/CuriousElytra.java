@@ -22,6 +22,8 @@ package top.theillusivec4.curiouselytra;
 import java.util.Set;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+
+import com.gildedgames.aether.common.item.accessories.cape.CapeItem;
 import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ElytraItem;
@@ -61,6 +63,7 @@ public class CuriousElytra {
 
   public static boolean isNetheritePlusLoaded = false;
   public static boolean isSilentGearLoaded = false;
+  public static boolean isAetherLoaded = false;
 
   public CuriousElytra() {
     IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
@@ -69,6 +72,7 @@ public class CuriousElytra {
     eventBus.addListener(this::setup);
     isNetheritePlusLoaded = ModList.get().isLoaded("netherite_plus");
     isSilentGearLoaded = ModList.get().isLoaded("silentgear");
+    isAetherLoaded = ModList.get().isLoaded("aether");
   }
 
   private void setup(final FMLCommonSetupEvent evt) {
@@ -152,6 +156,16 @@ public class CuriousElytra {
                   evt.setResourceLocation(new ResourceLocation("mana-and-artifice:textures/entity/elytra.png"));
                   evt.setEnchanted(true);
                 }
+              }
+
+              if (isAetherLoaded) {
+                CuriosApi.getCuriosHelper().findEquippedCurio((item) -> item.getItem() instanceof CapeItem, evt.getPlayer()).ifPresent(triple ->
+                        CuriosApi.getCuriosHelper().getCuriosHandler(evt.getPlayer()).ifPresent(capeHandler -> capeHandler.getStacksHandler(triple.getLeft()).ifPresent(capeStacksHandler -> {
+                          CapeItem cape = (CapeItem) triple.getRight().getItem();
+                          if (cape.getCapeTexture() != null && capeStacksHandler.getRenders().get(triple.getMiddle())) {
+                            evt.setResourceLocation(cape.getCapeTexture());
+                          }
+                        })));
               }
 
               if (stack.isEnchanted()) {
