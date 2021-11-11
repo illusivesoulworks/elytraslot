@@ -20,24 +20,24 @@
 package top.theillusivec4.curiouselytra;
 
 import java.util.UUID;
+import javax.annotation.Nonnull;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ElytraItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvents;
-import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import top.theillusivec4.caelus.api.CaelusApi;
 import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 
 public class CurioElytra implements ICurio {
 
-  public static final AttributeModifier ELYTRA_CURIO_MODIFIER = new AttributeModifier(
-      UUID.fromString("c754faef-9926-4a77-abbe-e34ef0d735aa"), "Elytra curio modifier", 1.0D,
-      AttributeModifier.Operation.ADDITION);
+  public static final AttributeModifier ELYTRA_CURIO_MODIFIER =
+      new AttributeModifier(UUID.fromString("c754faef-9926-4a77-abbe-e34ef0d735aa"),
+          "Elytra curio modifier", 1.0D, AttributeModifier.Operation.ADDITION);
 
   private final ItemStack stack;
 
@@ -58,19 +58,19 @@ public class CurioElytra implements ICurio {
   @Override
   public boolean canEquip(String identifier, LivingEntity entityLivingBase) {
     return !(entityLivingBase.getItemStackFromSlot(EquipmentSlotType.CHEST)
-        .getItem() instanceof ElytraItem) && !CuriosApi.getCuriosHelper()
-        .findEquippedCurio(CaelusApi::isElytra, entityLivingBase)
-        .isPresent();
+        .getItem() instanceof ElytraItem) &&
+        !CuriosApi.getCuriosHelper().findEquippedCurio(CaelusApi::isElytra, entityLivingBase)
+            .isPresent();
+  }
+
+  @Nonnull
+  @Override
+  public SoundInfo getEquipSound(SlotContext slotContext) {
+    return new SoundInfo(SoundEvents.ITEM_ARMOR_EQUIP_ELYTRA, 1.0F, 1.0F);
   }
 
   @Override
-  public void playRightClickEquipSound(LivingEntity livingEntity) {
-    livingEntity.world.playSound(null, new BlockPos(livingEntity.getPositionVec()),
-        SoundEvents.ITEM_ARMOR_EQUIP_ELYTRA, SoundCategory.NEUTRAL, 1.0F, 1.0F);
-  }
-
-  @Override
-  public boolean canRightClickEquip() {
+  public boolean canEquipFromUse(SlotContext slotContext) {
     return true;
   }
 }

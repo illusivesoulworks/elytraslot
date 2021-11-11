@@ -2,7 +2,6 @@ buildscript {
     repositories {
         maven { url = 'https://files.minecraftforge.net/maven' }
         maven { url 'https://plugins.gradle.org/m2/' }
-        jcenter()
         mavenCentral()
     }
     dependencies {
@@ -67,12 +66,9 @@ dependencies {
     minecraft "net.minecraftforge:forge:${version_forge}"
     compile fg.deobf("top.theillusivec4.curios:curios-forge:${version_curios}")
     compile fg.deobf("top.theillusivec4.caelus:caelus-forge:${version_caelus}")
-    compile fg.deobf("curse.maven:silentgear-297039:3221852")
+    compile fg.deobf("curse.maven:silentgear-297039:${cf_silentgear}")
 
-    compileOnly fg.deobf("curse.maven:enderitemod-401284:3098797")
-    compileOnly fg.deobf("curse.maven:netheriteplus-394120:3175587")
-
-    runtimeOnly fg.deobf("curse.maven:silentlib-242998:3165746")
+    runtimeOnly fg.deobf("curse.maven:silentlib-242998:${cf_silentlib}")
 
     compileOnly fileTree(dir: 'libs', include: '*.jar')
 }

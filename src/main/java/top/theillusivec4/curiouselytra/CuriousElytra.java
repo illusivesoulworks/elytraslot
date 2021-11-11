@@ -19,18 +19,20 @@
 
 package top.theillusivec4.curiouselytra;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-
-import com.gildedgames.aether.common.item.accessories.cape.CapeItem;
 import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ElytraItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -53,26 +55,43 @@ import top.theillusivec4.curios.api.SlotTypeMessage;
 import top.theillusivec4.curios.api.SlotTypePreset;
 import top.theillusivec4.curios.api.type.capability.ICurio;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
-import top.theillusivec4.curiouselytra.integration.NetheritePlusIntegration;
-import top.theillusivec4.curiouselytra.integration.SilentGearIntegration;
+import top.theillusivec4.curiouselytra.integration.AetherCape;
+import top.theillusivec4.curiouselytra.integration.EnderiteElytra;
+import top.theillusivec4.curiouselytra.integration.ICustomElytra;
+import top.theillusivec4.curiouselytra.integration.NetheritePlusElytra;
+import top.theillusivec4.curiouselytra.integration.SilentGearElytra;
+import top.theillusivec4.curiouselytra.integration.SpectralElytra;
 
-@Mod(CuriousElytra.MODID)
+@Mod(CuriousElytra.MOD_ID)
 public class CuriousElytra {
 
-  public static final String MODID = "curiouselytra";
+  public static final String MOD_ID = "curiouselytra";
 
-  public static boolean isNetheritePlusLoaded = false;
-  public static boolean isSilentGearLoaded = false;
-  public static boolean isAetherLoaded = false;
+  private static final Map<String, Supplier<Supplier<ICustomElytra>>> INTEGRATIONS =
+      new HashMap<>();
+  private static final List<ICustomElytra> ACTIVE_INTEGRATIONS = new ArrayList<>();
+
+  static {
+    INTEGRATIONS.put("aether", () -> AetherCape::new);
+    INTEGRATIONS.put("silentgear", () -> SilentGearElytra::new);
+    INTEGRATIONS.put("netherite_plus", () -> NetheritePlusElytra::new);
+    INTEGRATIONS.put("mana-and-artifice", () -> SpectralElytra::new);
+    INTEGRATIONS.put("enderitemod", () -> EnderiteElytra::new);
+  }
 
   public CuriousElytra() {
     IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
     eventBus.addListener(this::enqueue);
     eventBus.addListener(this::clientSetup);
     eventBus.addListener(this::setup);
-    isNetheritePlusLoaded = ModList.get().isLoaded("netherite_plus");
-    isSilentGearLoaded = ModList.get().isLoaded("silentgear");
-    isAetherLoaded = ModList.get().isLoaded("aether");
+    ModList modList = ModList.get();
+
+    for (Map.Entry<String, Supplier<Supplier<ICustomElytra>>> entry : INTEGRATIONS.entrySet()) {
+
+      if (modList.isLoaded(entry.getKey())) {
+        ACTIVE_INTEGRATIONS.add(entry.getValue().get().get());
+      }
+    }
   }
 
   private void setup(final FMLCommonSetupEvent evt) {
@@ -99,18 +118,29 @@ public class CuriousElytra {
 
       if (!attributeInstance.hasModifier(CurioElytra.ELYTRA_CURIO_MODIFIER)) {
         CuriosApi.getCuriosHelper()
-            .findEquippedCurio((stack) -> CaelusApi.canElytraFly(player, stack), player)
-            .ifPresent(triple -> attributeInstance
-                .applyNonPersistentModifier(CurioElytra.ELYTRA_CURIO_MODIFIER));
+            .findEquippedCurio((stack) -> CaelusApi.canElytraFly(player, stack), player).ifPresent(
+                triple -> attributeInstance.applyNonPersistentModifier(
+                    CurioElytra.ELYTRA_CURIO_MODIFIER));
       }
     }
   }
 
   private void attachCapabilities(final AttachCapabilitiesEvent<ItemStack> evt) {
     ItemStack stack = evt.getObject();
+    boolean attachable = stack.getItem() instanceof ElytraItem;
 
-    if (stack.getItem() instanceof ElytraItem ||
-        (isNetheritePlusLoaded && NetheritePlusIntegration.isNetheriteElytra(stack.getItem()))) {
+    if (!attachable) {
+
+      for (ICustomElytra module : ACTIVE_INTEGRATIONS) {
+
+        if (module.attachCapability(stack)) {
+          attachable = true;
+          break;
+        }
+      }
+    }
+
+    if (attachable) {
       final LazyOptional<ICurio> elytraCurio = LazyOptional.of(() -> new CurioElytra(stack));
       evt.addCapability(CuriosCapability.ID_ITEM, new ICapabilityProvider() {
 
@@ -137,39 +167,24 @@ public class CuriousElytra {
           for (int i = 0; i < stackHandler.getSlots(); i++) {
             ItemStack stack = stackHandler.getStackInSlot(i);
 
-            if (CaelusApi.isElytra(stack) && stacksHandler.getRenders().get(i)) {
-              evt.setRender(true);
-              ResourceLocation rl = stack.getItem().getRegistryName();
+            if (stacksHandler.getRenders().get(i)) {
+              boolean isElytra = CaelusApi.isElytra(stack);
 
-              if (rl != null) {
+              for (ICustomElytra module : ACTIVE_INTEGRATIONS) {
 
-                if (rl.equals(new ResourceLocation("enderitemod:enderite_elytra_seperated"))) {
-                  evt.setResourceLocation(
-                      new ResourceLocation("minecraft:textures/entity/enderite_elytra.png"));
-                } else if (rl.equals(new ResourceLocation("netherite_plus:netherite_elytra"))) {
-                  evt.setResourceLocation(
-                      new ResourceLocation("netherite_plus:textures/entity/netherite_elytra.png"));
-                } else if (isSilentGearLoaded && SilentGearIntegration.isSilentGearElytra(stack)) {
-                  evt.setResourceLocation(SilentGearIntegration.getElytraTexture());
-                  evt.setColor(SilentGearIntegration.getElytraColor(stack));
-                } else if (rl.equals(new ResourceLocation("mana-and-artifice:spectral_elytra"))) {
-                  evt.setResourceLocation(new ResourceLocation("mana-and-artifice:textures/entity/elytra.png"));
-                  evt.setEnchanted(true);
+                if (module.renderElytra(stack, evt)) {
+                  isElytra = true;
+                  break;
                 }
               }
 
-              if (isAetherLoaded) {
-                CuriosApi.getCuriosHelper().findEquippedCurio((item) -> item.getItem() instanceof CapeItem, evt.getPlayer()).ifPresent(triple ->
-                        CuriosApi.getCuriosHelper().getCuriosHandler(evt.getPlayer()).ifPresent(capeHandler -> capeHandler.getStacksHandler(triple.getLeft()).ifPresent(capeStacksHandler -> {
-                          CapeItem cape = (CapeItem) triple.getRight().getItem();
-                          if (cape.getCapeTexture() != null && capeStacksHandler.getRenders().get(triple.getMiddle())) {
-                            evt.setResourceLocation(cape.getCapeTexture());
-                          }
-                        })));
-              }
+              if (isElytra) {
+                evt.setRender(true);
 
-              if (stack.isEnchanted()) {
-                evt.setEnchanted(true);
+                if (stack.isEnchanted()) {
+                  evt.setEnchanted(true);
+                }
+                return;
               }
             }
           }
