@@ -1,0 +1,91 @@
+plugins {
+    id 'fabric-loom' version '0.10-SNAPSHOT'
+    id 'com.matthewprenger.cursegradle' version '1.4.0'
+}
+
+sourceCompatibility = JavaVersion.VERSION_16
+targetCompatibility = JavaVersion.VERSION_16
+
+archivesBaseName = project.archives_base_name
+version = project.mod_version
+group = project.maven_group
+
+minecraft {
+}
+
+repositories {
+    maven {
+        url = "https://maven.theillusivec4.top/"
+    }
+    maven {
+        name = 'Ladysnake Mods'
+        url = 'https://ladysnake.jfrog.io/artifactory/mods'
+    }
+    maven {
+        name = "TerraformersMC"
+        url = "https://maven.terraformersmc.com/"
+    }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
+
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    modImplementation "dev.emi:trinkets:${trinkets_version}"
+}
+
+processResources {
+    inputs.property "version", project.version
+
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.encoding = "UTF-8"
+    it.options.release = 16
+}
+
+java {
+    withSourcesJar()
+}
+
+sourceSets {
+    main {
+        resources {
+            srcDirs += 'docs'
+        }
+    }
+}
+
+curseforge {
+    project {
+        apiKey = findProperty('curseKey') ?: 0
+        id = "${curse_id}"
+        releaseType = "${curse_release}"
+        changelogType = 'markdown'
+        changelog = file('CHANGELOG.md')
+        addGameVersion "Java 16"
+        addGameVersion "Fabric"
+        "${curse_versions}".split(',').each {
+            addGameVersion "${it}"
+        }
+        addArtifact(sourcesJar)
+        mainArtifact(file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar"))
+
+        relations {
+            requiredDependency 'trinkets-fabric'
+        }
+
+        afterEvaluate {
+            uploadTask.dependsOn(remapJar)
+        }
+    }
+
+    options {
+        forgeGradleIntegration = false
+    }
+}

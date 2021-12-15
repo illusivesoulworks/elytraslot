@@ -1,0 +1,12 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:elytra"
+  ],
+  "optional": [
+    "enderitemod:enderite_elytra_seperated",
+    "netherite_plus:netherite_elytra",
+    "silentgear:elytra",
+    "mana-and-artifice:spectral_elytra"
+  ]
+}

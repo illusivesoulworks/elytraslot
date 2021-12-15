@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "elytratrinket",
+  "version": "${version}",
+  "name": "Elytra Trinket",
+  "description": "Adds trinket support to the elytra so you can fly and wear chest armor at the same time.",
+  "authors": ["C4"],
+  "contact": {
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/elytra-trinket",
+    "sources": "https://github.com/TheIllusiveC4/ElytraTrinket",
+    "issues": "https://github.com/TheIllusiveC4/ElytraTrinket/issues"
+  },
+  "license": "LGPL-3.0-or-later",
+  "icon": "assets/elytratrinket/elytratrinket_icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "top.theillusivec4.elytratrinket.ElytraTrinketMod"
+    ],
+    "client": [
+      "top.theillusivec4.elytratrinket.client.ElytraTrinketClientMod"
+    ]
+  },
+  "mixins": [],
+  "depends": {
+    "fabricloader": ">=0.11.3",
+    "fabric": ">=0.44.0",
+    "minecraft": "1.17.x",
+    "trinkets": "*"
+  }
+}

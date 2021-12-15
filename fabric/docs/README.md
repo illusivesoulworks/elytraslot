@@ -1,0 +1,5 @@
+# Elytra Trinket [![](http://cf.way2muchnoise.eu/versions/elytra-trinket-fabric.svg)](https://www.curseforge.com/minecraft/mc-mods/elytra-trinket-fabric) [![](http://cf.way2muchnoise.eu/short_elytra-trinket-fabric_downloads.svg)](https://www.curseforge.com/minecraft/mc-mods/elytra-trinket-fabric/files) [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg?&style=flat-square)](https://www.gnu.org/licenses/lgpl-3.0) [![](https://img.shields.io/discord/500852157503766538.svg?color=green&label=Discord&style=flat-square)](https://discord.gg/JWgrdwt)
+
+## Overview
+
+Elytra Trinket is a mod that uses the [Trinkets API](https://www.curseforge.com/minecraft/mc-mods/trinkets-fabric) to add a new slot, the Cape slot, to the player inventory and allows the elytra to be placed into this slot. While the elytra is in this slot, it will grant the same flight capabilities as if it was in your chestplate slot. This allows the player to gain the benefits of the elytra without sacrificing an armor slot.
