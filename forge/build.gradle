@@ -19,10 +19,10 @@ version = "${mod_version}"
 group = "top.theillusivec4.curiouselytra"
 archivesBaseName = "curiouselytra-forge"
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(16)
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 minecraft {
-    mappings channel: 'parchment', version: '2021.12.12-1.17.1'
+    mappings channel: 'parchment', version: '2021.12.13-nightly-SNAPSHOT-1.18.1'
 
     runs {
         client {
