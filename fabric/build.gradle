@@ -67,7 +67,7 @@ curseforge {
         id = "${curse_id}"
         releaseType = "${curse_release}"
         changelogType = 'markdown'
-        changelog = file('CHANGELOG.md')
+        changelog = file('docs/CHANGELOG.md')
         addGameVersion "Java 16"
         addGameVersion "Fabric"
         "${curse_versions}".split(',').each {
