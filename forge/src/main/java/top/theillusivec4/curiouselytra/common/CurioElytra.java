@@ -17,21 +17,21 @@
  * License along with Curious Elytra.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-package top.theillusivec4.curiouselytra;
+package top.theillusivec4.curiouselytra.common;
 
 import java.util.UUID;
 import javax.annotation.Nonnull;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.AttributeModifier;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ElytraItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.SoundEvents;
-import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
-import top.theillusivec4.caelus.api.CaelusApi;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.item.ElytraItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurio;
+import top.theillusivec4.curios.api.type.util.ICuriosHelper;
 
 public class CurioElytra implements ICurio {
 
@@ -46,27 +46,34 @@ public class CurioElytra implements ICurio {
   }
 
   @Override
-  public void curioTick(String identifier, int index, LivingEntity entityLivingBase) {
-    Integer ticksFlying = ObfuscationReflectionHelper
-        .getPrivateValue(LivingEntity.class, entityLivingBase, "field_184629_bo");
+  public ItemStack getStack() {
+    return this.stack;
+  }
 
-    if (ticksFlying != null && entityLivingBase.isElytraFlying()) {
-      this.stack.elytraFlightTick(entityLivingBase, ticksFlying);
+  @Override
+  public void curioTick(SlotContext slotContext) {
+    LivingEntity livingEntity = slotContext.entity();
+    int ticks = livingEntity.getFallFlyingTicks();
+
+    if (ticks > 0 && livingEntity.isFallFlying()) {
+      this.stack.elytraFlightTick(livingEntity, ticks);
     }
   }
 
   @Override
-  public boolean canEquip(String identifier, LivingEntity entityLivingBase) {
-    return !(entityLivingBase.getItemStackFromSlot(EquipmentSlotType.CHEST)
-        .getItem() instanceof ElytraItem) &&
-        !CuriosApi.getCuriosHelper().findEquippedCurio(CaelusApi::isElytra, entityLivingBase)
-            .isPresent();
+  public boolean canEquip(SlotContext slotContext) {
+    LivingEntity livingEntity = slotContext.entity();
+    ICuriosHelper curiosHelper = CuriosApi.getCuriosHelper();
+    return !(livingEntity.getItemBySlot(EquipmentSlot.CHEST).getItem() instanceof ElytraItem) &&
+        curiosHelper.findEquippedCurio(
+            stack -> curiosHelper.getCurio(stack).map(curio -> curio instanceof CurioElytra)
+                .orElse(false), livingEntity).isEmpty();
   }
 
   @Nonnull
   @Override
   public SoundInfo getEquipSound(SlotContext slotContext) {
-    return new SoundInfo(SoundEvents.ITEM_ARMOR_EQUIP_ELYTRA, 1.0F, 1.0F);
+    return new SoundInfo(SoundEvents.ARMOR_EQUIP_ELYTRA, 1.0F, 1.0F);
   }
 
   @Override

@@ -23,16 +23,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Supplier;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ElytraItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.Direction;
+import net.minecraft.core.Direction;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -48,50 +49,46 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import top.theillusivec4.caelus.api.CaelusApi;
-import top.theillusivec4.caelus.api.RenderElytraEvent;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.CuriosCapability;
 import top.theillusivec4.curios.api.SlotTypeMessage;
 import top.theillusivec4.curios.api.SlotTypePreset;
 import top.theillusivec4.curios.api.type.capability.ICurio;
+import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
-import top.theillusivec4.curiouselytra.integration.AetherCape;
-import top.theillusivec4.curiouselytra.integration.EnderiteElytra;
-import top.theillusivec4.curiouselytra.integration.ICustomElytra;
-import top.theillusivec4.curiouselytra.integration.NetheritePlusElytra;
-import top.theillusivec4.curiouselytra.integration.SilentGearElytra;
-import top.theillusivec4.curiouselytra.integration.SpectralElytra;
+import top.theillusivec4.curiouselytra.client.CuriousElytraClientMod;
+import top.theillusivec4.curiouselytra.common.CurioElytra;
+import top.theillusivec4.curiouselytra.common.IElytraProvider;
+import top.theillusivec4.curiouselytra.common.VanillaElytraProvider;
+import top.theillusivec4.curiouselytra.common.integration.SilentGearElytraProvider;
 
-@Mod(CuriousElytra.MOD_ID)
-public class CuriousElytra {
+@Mod(CuriousElytraMod.MOD_ID)
+public class CuriousElytraMod {
 
   public static final String MOD_ID = "curiouselytra";
 
-  private static final Map<String, Supplier<Supplier<ICustomElytra>>> INTEGRATIONS =
+  private static final Map<String, Supplier<Supplier<IElytraProvider>>> PROVIDERS =
       new HashMap<>();
-  private static final List<ICustomElytra> ACTIVE_INTEGRATIONS = new ArrayList<>();
+  private static final List<IElytraProvider> ACTIVE_PROVIDERS = new ArrayList<>();
 
   static {
-    INTEGRATIONS.put("aether", () -> AetherCape::new);
-    INTEGRATIONS.put("silentgear", () -> SilentGearElytra::new);
-    INTEGRATIONS.put("netherite_plus", () -> NetheritePlusElytra::new);
-    INTEGRATIONS.put("mana-and-artifice", () -> SpectralElytra::new);
-    INTEGRATIONS.put("enderitemod", () -> EnderiteElytra::new);
+    PROVIDERS.put("silentgear", () -> SilentGearElytraProvider::new);
   }
 
-  public CuriousElytra() {
+  public CuriousElytraMod() {
     IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
     eventBus.addListener(this::enqueue);
     eventBus.addListener(this::clientSetup);
     eventBus.addListener(this::setup);
     ModList modList = ModList.get();
 
-    for (Map.Entry<String, Supplier<Supplier<ICustomElytra>>> entry : INTEGRATIONS.entrySet()) {
+    for (Map.Entry<String, Supplier<Supplier<IElytraProvider>>> entry : PROVIDERS.entrySet()) {
 
       if (modList.isLoaded(entry.getKey())) {
-        ACTIVE_INTEGRATIONS.add(entry.getValue().get().get());
+        ACTIVE_PROVIDERS.add(entry.getValue().get().get());
       }
     }
+    ACTIVE_PROVIDERS.add(new VanillaElytraProvider());
   }
 
   private void setup(final FMLCommonSetupEvent evt) {
@@ -100,7 +97,7 @@ public class CuriousElytra {
   }
 
   private void clientSetup(final FMLClientSetupEvent evt) {
-    MinecraftForge.EVENT_BUS.addListener(this::renderElytra);
+    CuriousElytraClientMod.setup();
   }
 
   private void enqueue(final InterModEnqueueEvent evt) {
@@ -109,29 +106,27 @@ public class CuriousElytra {
   }
 
   private void playerTick(final TickEvent.PlayerTickEvent evt) {
-    PlayerEntity player = evt.player;
-    ModifiableAttributeInstance attributeInstance =
-        player.getAttribute(CaelusApi.ELYTRA_FLIGHT.get());
+    Player player = evt.player;
+    AttributeInstance attributeInstance =
+        player.getAttribute(CaelusApi.getInstance().getFlightAttribute());
 
     if (attributeInstance != null) {
       attributeInstance.removeModifier(CurioElytra.ELYTRA_CURIO_MODIFIER);
 
-      if (!attributeInstance.hasModifier(CurioElytra.ELYTRA_CURIO_MODIFIER)) {
-        CuriosApi.getCuriosHelper()
-            .findEquippedCurio((stack) -> CaelusApi.canElytraFly(player, stack), player).ifPresent(
-                triple -> attributeInstance.applyNonPersistentModifier(
-                    CurioElytra.ELYTRA_CURIO_MODIFIER));
+      if (!attributeInstance.hasModifier(CurioElytra.ELYTRA_CURIO_MODIFIER) &&
+          getElytraProvider(player, true).isPresent()) {
+        attributeInstance.addTransientModifier(CurioElytra.ELYTRA_CURIO_MODIFIER);
       }
     }
   }
 
   private void attachCapabilities(final AttachCapabilitiesEvent<ItemStack> evt) {
     ItemStack stack = evt.getObject();
-    boolean attachable = stack.getItem() instanceof ElytraItem;
+    boolean attachable = stack.getItem() == Items.ELYTRA;
 
     if (!attachable) {
 
-      for (ICustomElytra module : ACTIVE_INTEGRATIONS) {
+      for (IElytraProvider module : ACTIVE_PROVIDERS) {
 
         if (module.attachCapability(stack)) {
           attachable = true;
@@ -155,41 +150,26 @@ public class CuriousElytra {
     }
   }
 
-  private void renderElytra(final RenderElytraEvent evt) {
-    PlayerEntity playerEntity = evt.getPlayer();
-    CuriosApi.getCuriosHelper().getCuriosHandler(playerEntity).ifPresent(handler -> {
-      Set<String> tags = CuriosApi.getCuriosHelper().getCurioTags(Items.ELYTRA);
+  public static Optional<IElytraProvider> getElytraProvider(final LivingEntity livingEntity,
+                                                            boolean shouldFly) {
+    AtomicReference<IElytraProvider> result = new AtomicReference<>();
+    CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity).ifPresent(curios -> {
 
-      for (String id : tags) {
-        handler.getStacksHandler(id).ifPresent(stacksHandler -> {
-          IDynamicStackHandler stackHandler = stacksHandler.getStacks();
+      for (Map.Entry<String, ICurioStacksHandler> entry : curios.getCurios().entrySet()) {
+        IDynamicStackHandler stacks = entry.getValue().getStacks();
 
-          for (int i = 0; i < stackHandler.getSlots(); i++) {
-            ItemStack stack = stackHandler.getStackInSlot(i);
+        for (int i = 0; i < stacks.getSlots(); i++) {
+          ItemStack stack = stacks.getStackInSlot(i);
 
-            if (stacksHandler.getRenders().get(i)) {
-              boolean isElytra = CaelusApi.isElytra(stack);
+          for (IElytraProvider provider : ACTIVE_PROVIDERS) {
 
-              for (ICustomElytra module : ACTIVE_INTEGRATIONS) {
-
-                if (module.renderElytra(stack, evt)) {
-                  isElytra = true;
-                  break;
-                }
-              }
-
-              if (isElytra) {
-                evt.setRender(true);
-
-                if (stack.isEnchanted()) {
-                  evt.setEnchanted(true);
-                }
-                return;
-              }
+            if (provider.matches(stack) && (!shouldFly || provider.canFly(stack, livingEntity))) {
+              result.set(provider);
             }
           }
-        });
+        }
       }
     });
+    return Optional.ofNullable(result.get());
   }
 }
