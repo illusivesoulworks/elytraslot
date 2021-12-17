@@ -122,16 +122,13 @@ public class CuriousElytraMod {
 
   private void attachCapabilities(final AttachCapabilitiesEvent<ItemStack> evt) {
     ItemStack stack = evt.getObject();
-    boolean attachable = stack.getItem() == Items.ELYTRA;
+    boolean attachable = false;
 
-    if (!attachable) {
+    for (IElytraProvider module : ACTIVE_PROVIDERS) {
 
-      for (IElytraProvider module : ACTIVE_PROVIDERS) {
-
-        if (module.attachCapability(stack)) {
-          attachable = true;
-          break;
-        }
+      if (module.attachCapability(stack)) {
+        attachable = true;
+        break;
       }
     }
 
