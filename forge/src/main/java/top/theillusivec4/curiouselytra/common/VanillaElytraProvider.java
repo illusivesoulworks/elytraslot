@@ -7,7 +7,7 @@ public class VanillaElytraProvider implements IElytraProvider {
 
   @Override
   public boolean attachCapability(ItemStack stack) {
-    return true;
+    return matches(stack);
   }
 
   @Override
