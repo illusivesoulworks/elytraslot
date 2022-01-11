@@ -16,13 +16,13 @@ import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.PlayerModelPart;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import top.theillusivec4.curiouselytra.CuriousElytraMod;
+import top.theillusivec4.curiouselytra.common.IElytraProvider;
 
 @OnlyIn(Dist.CLIENT)
 public class CurioElytraLayer<T extends LivingEntity, M extends EntityModel<T>>
@@ -38,9 +38,10 @@ public class CurioElytraLayer<T extends LivingEntity, M extends EntityModel<T>>
   public void render(@Nonnull PoseStack pMatrixStack, @Nonnull MultiBufferSource pBuffer,
                      int pPackedLight, T pLivingEntity, float pLimbSwing, float pLimbSwingAmount,
                      float pPartialTicks, float pAgeInTicks, float pNetHeadYaw, float pHeadPitch) {
-    ItemStack itemstack = pLivingEntity.getItemBySlot(EquipmentSlot.CHEST);
-    CuriousElytraMod.getElytraProvider(pLivingEntity, false).ifPresent(provider -> {
+    CuriousElytraMod.getElytra(pLivingEntity, false).ifPresent(elytra -> {
       ResourceLocation resourcelocation;
+      IElytraProvider provider = elytra.getFirst();
+      ItemStack stack = elytra.getSecond();
 
       if (pLivingEntity instanceof AbstractClientPlayer abstractclientplayer) {
 
@@ -53,10 +54,10 @@ public class CurioElytraLayer<T extends LivingEntity, M extends EntityModel<T>>
                 PlayerModelPart.CAPE)) {
           resourcelocation = abstractclientplayer.getCloakTextureLocation();
         } else {
-          resourcelocation = provider.getTexture(itemstack);
+          resourcelocation = provider.getTexture(stack);
         }
       } else {
-        resourcelocation = provider.getTexture(itemstack);
+        resourcelocation = provider.getTexture(stack);
       }
       pMatrixStack.pushPose();
       pMatrixStack.translate(0.0D, 0.0D, 0.125D);
@@ -65,8 +66,8 @@ public class CurioElytraLayer<T extends LivingEntity, M extends EntityModel<T>>
           pNetHeadYaw, pHeadPitch);
       VertexConsumer vertexconsumer =
           ItemRenderer.getArmorFoilBuffer(pBuffer, RenderType.armorCutoutNoCull(resourcelocation),
-              false, provider.isEnchanted(itemstack));
-      Color color = provider.getColor(itemstack);
+              false, provider.isEnchanted(stack));
+      Color color = provider.getColor(stack);
       float red = color.getRed() / 255.0F;
       float green = color.getGreen() / 255.0F;
       float blue = color.getBlue() / 255.0F;

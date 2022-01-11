@@ -47,7 +47,7 @@ public class CuriousElytraClientMod {
 
   private static void renderCape(final RenderCapeEvent evt) {
 
-    if (CuriousElytraMod.getElytraProvider(evt.getPlayer(), false).isPresent()) {
+    if (CuriousElytraMod.getElytra(evt.getPlayer(), false).isPresent()) {
       evt.setCanceled(true);
     }
   }

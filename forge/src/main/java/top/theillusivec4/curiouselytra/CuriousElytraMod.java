@@ -19,6 +19,7 @@
 
 package top.theillusivec4.curiouselytra;
 
+import com.mojang.datafixers.util.Pair;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,7 +34,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -114,7 +114,7 @@ public class CuriousElytraMod {
       attributeInstance.removeModifier(CurioElytra.ELYTRA_CURIO_MODIFIER);
 
       if (!attributeInstance.hasModifier(CurioElytra.ELYTRA_CURIO_MODIFIER) &&
-          getElytraProvider(player, true).isPresent()) {
+          getElytra(player, true).isPresent()) {
         attributeInstance.addTransientModifier(CurioElytra.ELYTRA_CURIO_MODIFIER);
       }
     }
@@ -147,9 +147,10 @@ public class CuriousElytraMod {
     }
   }
 
-  public static Optional<IElytraProvider> getElytraProvider(final LivingEntity livingEntity,
-                                                            boolean shouldFly) {
-    AtomicReference<IElytraProvider> result = new AtomicReference<>();
+  public static Optional<Pair<IElytraProvider, ItemStack>> getElytra(
+      final LivingEntity livingEntity, boolean shouldFly) {
+    AtomicReference<IElytraProvider> atomicProvider = new AtomicReference<>();
+    AtomicReference<ItemStack> atomicStack = new AtomicReference<>(ItemStack.EMPTY);
     CuriosApi.getCuriosHelper().getCuriosHandler(livingEntity).ifPresent(curios -> {
 
       for (Map.Entry<String, ICurioStacksHandler> entry : curios.getCurios().entrySet()) {
@@ -161,12 +162,16 @@ public class CuriousElytraMod {
           for (IElytraProvider provider : ACTIVE_PROVIDERS) {
 
             if (provider.matches(stack) && (!shouldFly || provider.canFly(stack, livingEntity))) {
-              result.set(provider);
+              atomicProvider.set(provider);
+              atomicStack.set(stack);
             }
           }
         }
       }
     });
-    return Optional.ofNullable(result.get());
+    IElytraProvider resultProvider = atomicProvider.get();
+    ItemStack resultStack = atomicStack.get();
+    return resultProvider != null ? Optional.of(new Pair<>(resultProvider, resultStack)) :
+        Optional.empty();
   }
 }
