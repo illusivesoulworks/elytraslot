@@ -71,6 +71,8 @@ public class CuriousElytraMod {
       new HashMap<>();
   private static final List<IElytraProvider> ACTIVE_PROVIDERS = new ArrayList<>();
 
+  public static boolean isQuarkLoaded = false;
+
   static {
     PROVIDERS.put("silentgear", () -> SilentGearElytraProvider::new);
   }
@@ -89,6 +91,7 @@ public class CuriousElytraMod {
       }
     }
     ACTIVE_PROVIDERS.add(new VanillaElytraProvider());
+    isQuarkLoaded = modList.isLoaded("quark");
   }
 
   private void setup(final FMLCommonSetupEvent evt) {

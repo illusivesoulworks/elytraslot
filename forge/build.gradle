@@ -70,8 +70,12 @@ dependencies {
     implementation fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}")
     implementation fg.deobf("top.theillusivec4.caelus:caelus-forge:${caelus_version}")
     implementation fg.deobf("curse.maven:silentgear-297039:${cf_silentgear}")
+    implementation fg.deobf("curse.maven:quark-243121:3578106")
+//    implementation fg.deobf("curse.maven:alexsmobs-426558:3575698")
 
     runtimeOnly fg.deobf("curse.maven:silentlib-242998:${cf_silentlib}")
+    runtimeOnly fg.deobf("curse.maven:arl-250363:3575622")
+//    runtimeOnly fg.deobf("curse.maven:citadel-331936:3584733")
 }
 
 def replaceResources = tasks.register('replaceResources', Copy) {

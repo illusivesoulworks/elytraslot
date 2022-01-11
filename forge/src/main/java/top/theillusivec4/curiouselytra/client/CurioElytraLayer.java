@@ -23,6 +23,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import top.theillusivec4.curiouselytra.CuriousElytraMod;
 import top.theillusivec4.curiouselytra.common.IElytraProvider;
+import top.theillusivec4.curiouselytra.common.integration.QuarkModule;
 
 @OnlyIn(Dist.CLIENT)
 public class CurioElytraLayer<T extends LivingEntity, M extends EntityModel<T>>
@@ -42,6 +43,10 @@ public class CurioElytraLayer<T extends LivingEntity, M extends EntityModel<T>>
       ResourceLocation resourcelocation;
       IElytraProvider provider = elytra.getFirst();
       ItemStack stack = elytra.getSecond();
+
+      if (CuriousElytraMod.isQuarkLoaded) {
+        QuarkModule.setColoredStack(stack);
+      }
 
       if (pLivingEntity instanceof AbstractClientPlayer abstractclientplayer) {
 
