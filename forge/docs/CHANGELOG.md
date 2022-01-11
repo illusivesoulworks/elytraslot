@@ -4,6 +4,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project does not adhere to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 This project uses MCVERSION-MAJORMOD.MAJORAPI.MINOR.PATCH.
 
+## [1.18.1-5.0.1.0] - 2021.01.11
+### Added
+- Added support for Quark's Colored Runes [#40](https://github.com/TheIllusiveC4/CuriousElytra/issues/40)
+### Fixed
+- Fixed rendering errors and log spam with Silent Gear [#39](https://github.com/TheIllusiveC4/CuriousElytra/issues/39)
+- Fixed missing Caelus API requirement in `mods.toml`
+
 ## [1.18.1-5.0.0.1] - 2021.12.16
 ### Fixed
 - Fixed duplicate capability key errors [#37](https://github.com/TheIllusiveC4/CuriousElytra/issues/37)

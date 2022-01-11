@@ -31,3 +31,9 @@ Adds curio support to the elytra so you can fly and wear chest armor at the same
     versionRange="${curios_version_range}"
     ordering="NONE"
     side="BOTH"
+[[dependencies.curiouselytra]]
+    modId="caelus"
+    mandatory=true
+    versionRange="${caelus_version_range}"
+    ordering="NONE"
+    side="BOTH"
