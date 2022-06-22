@@ -29,7 +29,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ElytraItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.util.Pair;
 import net.minecraft.world.event.GameEvent;
 
@@ -57,7 +56,6 @@ public class ElytraTrinketMod implements ModInitializer {
             return true;
           }
         } else if (item instanceof FabricElytraItem fabricElytraItem) {
-
           if (fabricElytraItem.useCustomElytra(entity, stack, tickElytra)) {
             return true;
           }
@@ -75,7 +73,7 @@ public class ElytraTrinketMod implements ModInitializer {
       if ((nextRoll / 10) % 2 == 0) {
         stack.damage(1, entity, p -> TrinketsApi.onTrinketBroken(stack, slotRef, entity));
       }
-      entity.emitGameEvent(GameEvent.ELYTRA_FREE_FALL);
+      entity.emitGameEvent(GameEvent.ELYTRA_GLIDE);
     }
   }
 }
