@@ -1,147 +1,159 @@
 buildscript {
     repositories {
-		maven { url = 'https://files.minecraftforge.net/maven' }
-		maven { url = 'https://maven.parchmentmc.org' }
-        maven { url = 'https://plugins.gradle.org/m2/' }
+        maven { url = 'https://maven.minecraftforge.net' }
+		maven { url = 'https://plugins.gradle.org/m2/' }
+		maven {
+            name = 'ParchmentMC'
+            url = 'https://maven.parchmentmc.org/'
+        }
         mavenCentral()
     }
     dependencies {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
+        classpath group: 'org.parchmentmc', name: 'librarian', version: '1.+'
         classpath group: 'gradle.plugin.com.matthewprenger', name: 'CurseGradle', version: '1.4.0'
-		classpath group: 'org.parchmentmc', name: 'librarian', version: '1.+'
     }
 }
+apply plugin: 'java'
 apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'com.matthewprenger.cursegradle'
+apply plugin: 'eclipse'
+apply plugin: 'maven-publish'
 apply plugin: 'org.parchmentmc.librarian.forgegradle'
+apply plugin: 'com.matthewprenger.cursegradle'
 
-version = "${mod_version}"
-group = "top.theillusivec4.curiouselytra"
-archivesBaseName = "curiouselytra-forge"
-
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+archivesBaseName = "${mod_id}-forge"
 
 minecraft {
-    mappings channel: 'parchment', version: '2021.12.13-nightly-SNAPSHOT-1.18.1'
+    mappings channel: 'parchment', version: "${forge_parchment_version}"
+    
+    if (project.hasProperty('forge_ats_enabled') && project.findProperty('forge_ats_enabled').toBoolean()) {
+        // This location is hardcoded in Forge and can not be changed.
+        // https://github.com/MinecraftForge/MinecraftForge/blob/be1698bb1554f9c8fa2f58e32b9ab70bc4385e60/fmlloader/src/main/java/net/minecraftforge/fml/loading/moddiscovery/ModFile.java#L123
+        accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+        project.logger.debug('Forge Access Transformers are enabled for this project.')
+    }
 
     runs {
         client {
             workingDirectory project.file('run')
-
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-            property 'forge.logging.console.level', 'debug'
-			property 'mixin.env.disableRefMap', 'true'
-
+            ideaModule "${rootProject.name}.${project.name}.main"
+            taskName 'Client'
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
             mods {
-                curiouselytra {
+                modClientRun {
                     source sourceSets.main
+                    source project(":common").sourceSets.main
                 }
             }
         }
 
         server {
             workingDirectory project.file('run')
-
-            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
-            property 'forge.logging.console.level', 'debug'
-			property 'mixin.env.disableRefMap', 'true'
-
+            ideaModule "${rootProject.name}.${project.name}.main"
+            taskName 'Server'
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
             mods {
-                curiouselytra {
+                modServerRun {
                     source sourceSets.main
+                    source project(":common").sourceSets.main
+                }
+            }
+        }
+
+        data {
+            workingDirectory project.file('run')
+            ideaModule "${rootProject.name}.${project.name}.main"
+            args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+            taskName 'Data'
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
+            mods {
+                modDataRun {
+                    source sourceSets.main
+                    source project(":common").sourceSets.main
                 }
             }
         }
     }
 }
 
-repositories {
-    maven {
-        url = "https://maven.theillusivec4.top/"
-    }
-    maven {
-        name = "CurseMaven"
-        url = "https://www.cursemaven.com"
-    }
-}
+sourceSets.main.resources.srcDir 'src/generated/resources'
 
 dependencies {
-    minecraft "net.minecraftforge:forge:${forge_version}"
-    implementation fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}")
-    implementation fg.deobf("top.theillusivec4.caelus:caelus-forge:${caelus_version}")
-    implementation fg.deobf("curse.maven:silentgear-297039:${cf_silentgear}")
-    implementation fg.deobf("curse.maven:quark-243121:3578106")
-//    implementation fg.deobf("curse.maven:alexsmobs-426558:3575698")
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+    compileOnly project(":common")
 
-    runtimeOnly fg.deobf("curse.maven:silentlib-242998:${cf_silentlib}")
-    runtimeOnly fg.deobf("curse.maven:arl-250363:3575622")
-//    runtimeOnly fg.deobf("curse.maven:citadel-331936:3584733")
+    runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}")
+    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}:api")
+
+    runtimeOnly fg.deobf("top.theillusivec4.caelus:caelus-forge:${caelus_version}")
+    compileOnly fg.deobf("top.theillusivec4.caelus:caelus-forge:${caelus_version}:api")
 }
 
-def replaceResources = tasks.register('replaceResources', Copy) {
+tasks.withType(JavaCompile) {
+    source(project(":common").sourceSets.main.allSource)
+}
+
+def replaceResources = tasks.register("replaceResources", Copy) {
     it.outputs.upToDateWhen { false }
 
     it.from(sourceSets.main.resources) {
-        include 'META-INF/mods.toml'
-        expand 'version': version, 'mc_version_range': mc_version_range, 'forge_version_range': forge_version_range, 'loader_version': loader_version, 'curios_version_range': curios_version_range, 'caelus_version_range': caelus_version_range
+        include "META-INF/mods.toml"
+        expand 'version': version, 'forge_mc_version_range': forge_mc_version_range, 'forge_version_range': forge_version_range,
+                'license': license, 'mod_id': mod_id, 'mod_author': mod_author, 'mod_description': mod_description,
+                'mod_name': mod_name, 'issue_tracker': issue_tracker, 'curios_version_range': curios_version_range,
+                'caelus_version_range': caelus_version_range
+    }
+    it.from(project(":common").sourceSets.main.resources) {
+        include "pack.mcmeta"
+        expand 'mod_name': mod_name
     }
     it.into "$buildDir/resources/main/"
 }
 
 processResources {
+    from project(":common").sourceSets.main.resources
     duplicatesStrategy(DuplicatesStrategy.FAIL)
     exclude('META-INF/mods.toml')
+    exclude('pack.mcmeta')
     configure { finalizedBy(replaceResources) }
-}
-
-sourceSets {
-    main {
-        resources {
-            srcDirs += 'docs'
-        }
-    }
-}
-
-jar {
-    manifest {
-        attributes(["Specification-Title"     : "Curious Elytra",
-                    "Specification-Vendor"    : "C4",
-                    "Specification-Version"   : "1",
-                    "Implementation-Title"    : "Curious Elytra",
-                    "Implementation-Version"  : "${getArchiveVersion()}",
-                    "Implementation-Vendor"   : "C4",
-                    "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")],)
-    }
-}
-
-task sourcesJar(type: Jar) {
-    archiveClassifier.set('sources')
-    from sourceSets.main.allJava
-}
-
-artifacts {
-    archives sourcesJar
 }
 
 jar.finalizedBy('reobfJar')
 
-tasks.build.dependsOn sourcesJar
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId project.group
+            artifactId project.archivesBaseName
+            version project.version
+            artifact jar
+        }
+    }
+    repositories {
+        maven {
+            url "file://" + System.getenv("local_maven")
+        }
+    }
+}
 
 curseforge {
-
     project {
         apiKey = findProperty('curseKey') ?: 0
-        id = "317716"
-        releaseType = "${curse_release}"
+        id = "${cf_forge_id}"
+        releaseType = "${cf_release}"
         changelogType = 'markdown'
-        changelog = file('docs/CHANGELOG.md')
+        changelog = file("../CHANGELOG_LATEST.md")
+        addArtifact(sourcesJar)
+        "${cf_versions}".split(',').each {
+            addGameVersion "${it}"
+        }
+
         relations {
             requiredDependency 'curios'
             requiredDependency 'caelus'
-        }
-        addArtifact(sourcesJar)
-        "${curse_versions}".split(',').each {
-            addGameVersion "${it}"
         }
     }
 }

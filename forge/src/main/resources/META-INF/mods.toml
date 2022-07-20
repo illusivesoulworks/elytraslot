@@ -1,37 +1,36 @@
 modLoader="javafml"
-loaderVersion="${loader_version}"
-license="LGPL-3.0-or-later"
-issueTrackerURL="https://github.com/TheIllusiveC4/CuriousElytra/issues"
-logoFile="curiouselytra_icon.png"
+loaderVersion="[41,)"
+license="${license}"
 logoBlur=false
+issueTrackerURL="${issue_tracker}"
+logoFile="${mod_id}_icon.png"
 [[mods]]
-modId="curiouselytra"
+modId="${mod_id}"
 version="${version}"
-displayName="Curious Elytra"
-displayURL="https://github.com/TheIllusiveC4/CuriousElytra"
-authors="C4"
+displayName="${mod_name}"
+authors="${mod_author}"
 description='''
-Adds curio support to the elytra so you can fly and wear chest armor at the same time.
+${mod_description}
 '''
-[[dependencies.curiouselytra]]
+[[dependencies.elytraslot]]
     modId="forge"
     mandatory=true
     versionRange="${forge_version_range}"
     ordering="NONE"
     side="BOTH"
-[[dependencies.curiouselytra]]
+[[dependencies.elytraslot]]
     modId="minecraft"
     mandatory=true
-    versionRange="${mc_version_range}"
+    versionRange="${forge_mc_version_range}"
     ordering="NONE"
     side="BOTH"
-[[dependencies.curiouselytra]]
+[[dependencies.elytraslot]]
     modId="curios"
     mandatory=true
     versionRange="${curios_version_range}"
     ordering="NONE"
     side="BOTH"
-[[dependencies.curiouselytra]]
+[[dependencies.elytraslot]]
     modId="caelus"
     mandatory=true
     versionRange="${caelus_version_range}"
