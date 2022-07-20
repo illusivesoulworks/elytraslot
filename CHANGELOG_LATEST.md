@@ -4,7 +4,7 @@ This is a copy of the changelog for the most recent version. For the full versio
 
 ## [6.0.0-beta.1+1.19] - 2022.07.20
 ### Changed
-- Merged Forge and Fabric versions of the project together using the MultiLoader template
+- Merged Forge and Fabric versions of the project together using the [MultiLoader template](https://github.com/jaredlll08/MultiLoader-Template)
 - Changed to [Semantic Versioning](http://semver.org/spec/v2.0.0.html)
 - Updated to Minecraft 1.19
 - [Forge] Updated to Forge 41+
