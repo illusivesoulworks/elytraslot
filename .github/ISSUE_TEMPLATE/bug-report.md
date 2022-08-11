@@ -12,10 +12,10 @@ assignees: TheIllusiveC4
 Please reproduce all issues without any other unnecessary mods before submitting.
 -->
 #### Versions (Be specific, do not write "latest"):
-* Curious Elytra:
-* Caelus:
-* Curios:
-* Forge:
+* Elytra Slot:
+* Caelus (Forge only):
+* Curios/Trinket:
+* Forge/Fabric:
 #### Observed Behavior:
 #### Expected Behavior:
 #### Steps to Reproduce:
@@ -24,4 +24,4 @@ Please reproduce all issues without any other unnecessary mods before submitting
 3.
 ...
 
-Crash Log: Please use a paste site like [hastebin](https://hastebin.com/).
+Crash Log: Please use a paste site like [pastebin](https://pastebin.com/).
