@@ -15,12 +15,19 @@
  * License along with Elytra Slot. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.illusivesoulworks.elytraslot.client;
+package com.illusivesoulworks.elytraslot.platform.services;
 
-import java.awt.Color;
+import java.util.Set;
+import javax.annotation.Nonnull;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item;
 
-public record ElytraRenderResult(Color color, ResourceLocation texture, boolean enchanted,
-                                 ItemStack stack, boolean useCapeTexture) {
+public interface IPlatform {
+
+  boolean isModLoaded(String id);
+
+  ResourceLocation getId(Item item);
+
+  @Nonnull
+  Set<ResourceLocation> getEntityTypes();
 }

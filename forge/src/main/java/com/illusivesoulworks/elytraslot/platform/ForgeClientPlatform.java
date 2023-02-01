@@ -15,12 +15,22 @@
  * License along with Elytra Slot. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.illusivesoulworks.elytraslot.client;
+package com.illusivesoulworks.elytraslot.platform;
 
-import java.awt.Color;
+import com.illusivesoulworks.elytraslot.common.integration.MinecraftCapesPlugin;
+import com.illusivesoulworks.elytraslot.platform.services.IClientPlatform;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.entity.player.Player;
 
-public record ElytraRenderResult(Color color, ResourceLocation texture, boolean enchanted,
-                                 ItemStack stack, boolean useCapeTexture) {
+public class ForgeClientPlatform implements IClientPlatform {
+
+  @Override
+  public boolean hasCustomCape(Player player) {
+    return MinecraftCapesPlugin.getCustomCape(player) != null;
+  }
+
+  @Override
+  public ResourceLocation getCustomCape(Player player) {
+    return MinecraftCapesPlugin.getCustomCape(player);
+  }
 }

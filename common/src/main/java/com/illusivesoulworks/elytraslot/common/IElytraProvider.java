@@ -32,10 +32,14 @@ public interface IElytraProvider {
   boolean matches(ItemStack stack);
 
   default ElytraRenderResult getRender(ItemStack stack) {
-    return new ElytraRenderResult(COLOR, TEXTURE, stack.isEnchanted());
+    return new ElytraRenderResult(COLOR, TEXTURE, stack.isEnchanted(), stack, hasCapeTexture(stack));
   }
 
   default boolean canFly(ItemStack stack, LivingEntity livingEntity, boolean doTick) {
     return Services.ELYTRA.canFly(stack, livingEntity, doTick);
+  }
+
+  default boolean hasCapeTexture(ItemStack stack) {
+    return true;
   }
 }

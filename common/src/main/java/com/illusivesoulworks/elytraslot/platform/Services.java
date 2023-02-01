@@ -18,12 +18,16 @@
 package com.illusivesoulworks.elytraslot.platform;
 
 import com.illusivesoulworks.elytraslot.ElytraSlotConstants;
+import com.illusivesoulworks.elytraslot.platform.services.IClientPlatform;
 import com.illusivesoulworks.elytraslot.platform.services.IElytraPlatform;
+import com.illusivesoulworks.elytraslot.platform.services.IPlatform;
 import java.util.ServiceLoader;
 
 public class Services {
 
   public static final IElytraPlatform ELYTRA = load(IElytraPlatform.class);
+  public static final IPlatform PLATFORM = load(IPlatform.class);
+  public static final IClientPlatform CLIENT = load(IClientPlatform.class);
 
   public static <T> T load(Class<T> clazz) {
     final T loadedService = ServiceLoader.load(clazz)

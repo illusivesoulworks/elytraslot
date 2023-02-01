@@ -15,12 +15,21 @@
  * License along with Elytra Slot. If not, see <https://www.gnu.org/licenses/>.
  */
 
-package com.illusivesoulworks.elytraslot.client;
+package com.illusivesoulworks.elytraslot.common.integration;
 
-import java.awt.Color;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.entity.player.Player;
+import net.minecraftcapes.config.MinecraftCapesConfig;
+import net.minecraftcapes.player.PlayerHandler;
 
-public record ElytraRenderResult(Color color, ResourceLocation texture, boolean enchanted,
-                                 ItemStack stack, boolean useCapeTexture) {
+public class MinecraftCapesPlugin {
+
+  public static ResourceLocation getCustomCape(Player player) {
+    PlayerHandler playerHandler = PlayerHandler.getFromPlayer(player);
+
+    if (playerHandler.getCapeLocation() != null && MinecraftCapesConfig.isCapeVisible()) {
+      return playerHandler.getCapeLocation();
+    }
+    return null;
+  }
 }

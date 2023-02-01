@@ -19,6 +19,7 @@ package com.illusivesoulworks.elytraslot;
 
 import com.illusivesoulworks.elytraslot.client.ElytraRenderResult;
 import com.illusivesoulworks.elytraslot.common.IElytraProvider;
+import com.illusivesoulworks.elytraslot.common.SimpleCompatibilityProvider;
 import com.illusivesoulworks.elytraslot.common.VanillaElytraProvider;
 import com.illusivesoulworks.elytraslot.platform.Services;
 import java.util.LinkedList;
@@ -51,6 +52,7 @@ public class ElytraSlotCommonMod {
 
   public static void init() {
     PROVIDERS.add(new VanillaElytraProvider());
+    PROVIDERS.add(new SimpleCompatibilityProvider());
   }
 
   public static Optional<ElytraRenderResult> getElytraRender(final LivingEntity livingEntity) {
