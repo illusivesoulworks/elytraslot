@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import org.jetbrains.annotations.NotNull;
@@ -38,12 +38,12 @@ public class FabricPlatform implements IPlatform {
 
   @Override
   public ResourceLocation getId(Item item) {
-    return Registry.ITEM.getKey(item);
+    return BuiltInRegistries.ITEM.getKey(item);
   }
 
   @NotNull
   @Override
   public Set<ResourceLocation> getEntityTypes() {
-    return Registry.ENTITY_TYPE.keySet();
+    return BuiltInRegistries.ENTITY_TYPE.keySet();
   }
 }
