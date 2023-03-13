@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "quilt_loader": {
+    "group": "com.illusivesoulworks.${mod_id}",
+    "id": "${mod_id}",
+    "version": "${version}",
+    "intermediate_mappings": "net.fabricmc:intermediary",
+    "entrypoints": {
+      "client_init": [
+        "com.illusivesoulworks.elytraslot.ElytraSlotQuiltClientMod"
+      ],
+      "init": [
+        "com.illusivesoulworks.elytraslot.ElytraSlotQuiltMod"
+      ]
+    },
+    "depends": [
+      {
+        "id": "quilt_loader",
+        "version": "*"
+      },
+      {
+        "id": "quilt_base",
+        "version": "*"
+      },
+      {
+        "id": "minecraft",
+        "version": "${quilt_mc_version_range}"
+      },
+      {
+        "id": "java",
+        "version": ">=17"
+      },
+      {
+        "id": "quilted_fabric_api",
+        "version": "*"
+      }
+    ],
+    "metadata": {
+      "name": "${mod_name}",
+      "description": "${mod_description}",
+      "contributors": {
+        "${mod_author}": "Owner"
+      },
+      "license": "${license}"
+    }
+  },
+  "mixin": [],
+  "minecraft": {
+    "environment": "*"
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "replace": false,
+  "values": [
+    "minecraft:elytra",
+    {
+      "id": "deeperdarker:soul_elytra",
+      "required": false
+    },
+    {
+      "id": "enderitemod:enderite_elytra_seperated",
+      "required": false
+    },
+    {
+      "id": "lilwings:white_fox_elytra",
+      "required": false
+    },
+    {
+      "id": "lilwings:swamp_hopper_elytra",
+      "required": false
+    },
+    {
+      "id": "lilwings:swallow_tail_elytra",
+      "required": false
+    },
+    {
+      "id": "lilwings:shroom_skipper_elytra",
+      "required": false
+    },
+    {
+      "id": "lilwings:painted_panther_elytra",
+      "required": false
+    },
+    {
+      "id": "lilwings:crystal_puff_elytra",
+      "required": false
+    },
+    {
+      "id": "lilwings:cloudy_puff_elytra",
+      "required": false
+    },
+    {
+      "id": "lilwings:butter_gold_elytra",
+      "required": false
+    },
+    {
+      "id": "lilwings:aponi_elytra",
+      "required": false
+    },
+    {
+      "id": "lilwings:red_applefly_elytra",
+      "required": false
+    },
+    {
+      "id": "lilwings:gold_applefly_elytra",
+      "required": false
+    },
+    {
+      "id": "lilwings:grayling_elytra",
+      "required": false
+    },
+    {
+      "id": "lilwings:grayling_flowering_elytra",
+      "required": false
+    },
+    {
+      "id": "lilwings:grayling_blooming_elytra",
+      "required": false
+    }
+  ]
+}

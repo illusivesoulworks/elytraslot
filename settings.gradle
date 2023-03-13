@@ -14,4 +14,4 @@ pluginManagement {
 }
 
 rootProject.name = "${mod_name}"
-include("common", "fabric", "forge")
+include("common", "fabric", "forge", "quilt")

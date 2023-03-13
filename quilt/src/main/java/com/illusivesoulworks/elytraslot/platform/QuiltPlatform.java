@@ -21,20 +21,19 @@ import com.illusivesoulworks.elytraslot.platform.services.IPlatform;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import org.jetbrains.annotations.NotNull;
+import org.quiltmc.loader.api.QuiltLoader;
 
-public class FabricPlatform implements IPlatform {
+public class QuiltPlatform implements IPlatform {
 
   private static final Map<String, Boolean> CACHE = new HashMap<>();
 
   @Override
   public boolean isModLoaded(String id) {
-    return CACHE.computeIfAbsent(id, (input) -> FabricLoader.getInstance().isModLoaded(input));
+    return CACHE.computeIfAbsent(id, QuiltLoader::isModLoaded);
   }
 
   @Override

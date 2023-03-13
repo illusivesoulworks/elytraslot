@@ -17,34 +17,19 @@
 
 package com.illusivesoulworks.elytraslot.platform;
 
-import com.illusivesoulworks.elytraslot.platform.services.IPlatform;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
+import com.illusivesoulworks.elytraslot.platform.services.IClientPlatform;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
-import org.jetbrains.annotations.NotNull;
+import net.minecraft.world.entity.player.Player;
 
-public class FabricPlatform implements IPlatform {
-
-  private static final Map<String, Boolean> CACHE = new HashMap<>();
+public class QuiltClientPlatform implements IClientPlatform {
 
   @Override
-  public boolean isModLoaded(String id) {
-    return CACHE.computeIfAbsent(id, (input) -> FabricLoader.getInstance().isModLoaded(input));
+  public boolean hasCustomCape(Player player) {
+    return false;
   }
 
   @Override
-  public ResourceLocation getId(Item item) {
-    return BuiltInRegistries.ITEM.getKey(item);
-  }
-
-  @NotNull
-  @Override
-  public Set<ResourceLocation> getEntityTypes() {
-    return BuiltInRegistries.ENTITY_TYPE.keySet();
+  public ResourceLocation getCustomCape(Player player) {
+    return null;
   }
 }

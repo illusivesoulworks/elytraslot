@@ -12,6 +12,7 @@ buildscript {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
         classpath group: 'org.parchmentmc', name: 'librarian', version: '1.+'
         classpath group: 'gradle.plugin.com.matthewprenger', name: 'CurseGradle', version: '1.4.0'
+        classpath group: 'com.modrinth.minotaur', name: 'Minotaur', version: '2.+'
     }
 }
 apply plugin: 'java'
@@ -20,11 +21,12 @@ apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 apply plugin: 'org.parchmentmc.librarian.forgegradle'
 apply plugin: 'com.matthewprenger.cursegradle'
+apply plugin: 'com.modrinth.minotaur'
 
 archivesBaseName = "${mod_id}-forge"
 
 minecraft {
-    mappings channel: 'parchment', version: "${forge_parchment_version}"
+    mappings channel: 'parchment', version: "${parchment_mc_version}-${parchment_version}-${minecraft_version}"
     
     if (project.hasProperty('forge_ats_enabled') && project.findProperty('forge_ats_enabled').toBoolean()) {
         // This location is hardcoded in Forge and can not be changed.
@@ -93,7 +95,7 @@ repositories {
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     compileOnly project(":common")
-    compileOnly "curse.maven:mccapes-359836:4019977"
+    compileOnly "curse.maven:mccapes-359836:${mccapes_cf_file_id}"
 
     runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}")
     compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}:api")
@@ -152,12 +154,12 @@ publishing {
 curseforge {
     project {
         apiKey = findProperty('curseKey') ?: 0
-        id = "${cf_forge_id}"
-        releaseType = "${cf_release}"
+        id = "${cf_id}"
+        releaseType = "${release_type}"
         changelogType = 'markdown'
         changelog = file("../CHANGELOG_LATEST.md")
         addArtifact(sourcesJar)
-        "${cf_versions}".split(',').each {
+        "${release_versions}".split(',').each {
             addGameVersion "${it}"
         }
 
@@ -165,5 +167,20 @@ curseforge {
             requiredDependency 'curios'
             requiredDependency 'caelus'
         }
+    }
+}
+
+modrinth {
+    token = findProperty('modrinthKey') ?: 0
+    projectId = "${modrinth_id}"
+    versionName = getArchivesBaseName() + "-" + getVersion()
+    versionType = "${release_type}"
+    changelog = file('../CHANGELOG_LATEST.md').text
+    uploadFile = file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar")
+    additionalFiles = [sourcesJar]
+    gameVersions = "${release_versions}".split(",") as List<String>
+    dependencies {
+        required.project 'curios'
+        required.project 'caelus'
     }
 }

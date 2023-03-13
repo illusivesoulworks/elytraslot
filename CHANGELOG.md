@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 Prior to version 6.0.0, this project used MCVERSION-MAJORMOD.MAJORAPI.MINOR.PATCH.
 
+## [6.2.0+1.19.3] - 2023.03.13
+### Added
+- Added Quilt support
+### Changed
+- Updated to Minecraft 1.19.3
+- [Forge] Updated to Curios 1.19.3-5.1.2.0
+- [Forge] Updated to Caelus 1.19.3-3.0.0.7
+
 ## [6.1.0+1.19.2] - 2023.02.01
 ### Added
 - Added Lil' Wings compatibility [#62](https://github.com/illusivesoulworks/elytraslot/issues/62)

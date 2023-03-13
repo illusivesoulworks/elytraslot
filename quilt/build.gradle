@@ -1,12 +1,12 @@
 plugins {
-    id 'fabric-loom' version '0.12-SNAPSHOT'
+    id 'org.quiltmc.loom' version '1.+'
     id 'maven-publish'
     id 'idea'
 	id 'com.matthewprenger.cursegradle' version '1.4.0'
     id 'com.modrinth.minotaur' version '2.+'
 }
 
-archivesBaseName = "${mod_id}-fabric"
+archivesBaseName = "${mod_id}-quilt"
 
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
@@ -14,9 +14,13 @@ dependencies {
         officialMojangMappings()
         parchment("org.parchmentmc.data:parchment-${parchment_mc_version}:${parchment_version}@zip")
     })
-    modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
+    modImplementation "org.quiltmc:quilt-loader:${quilt_loader_version}"
+    modImplementation("org.quiltmc:qsl:${quilt_stdlib_version}") {
+        exclude group: "net.fabricmc"
+    }
+    modImplementation "org.quiltmc.quilted-fabric-api:quilted-fabric-api:${quilted_fabric_api_version}"
     modImplementation "dev.emi:trinkets:${trinkets_version}"
+    modCompileOnly "dev.onyxstudios.cardinal-components-api:cardinal-components-base:${cca_version}"
 
     modRuntimeOnly("com.terraformersmc:modmenu:${mod_menu_version}") {
         transitive = false
@@ -29,13 +33,13 @@ loom {
     runs {
         client {
             client()
-            setConfigName("Fabric Client")
+            setConfigName("Quilt Client")
             ideConfigGenerated(true)
             runDir("run")
         }
         server {
             server()
-            setConfigName("Fabric Server")
+            setConfigName("Quilt Server")
             ideConfigGenerated(true)
             runDir("run")
         }
@@ -47,10 +51,10 @@ processResources {
     from project(":common").sourceSets.main.resources
     inputs.property "version", project.version
 
-    filesMatching("fabric.mod.json") {
-        expand 'version': project.version, 'fabric_mc_version_range': project.fabric_mc_version_range, 'license': project.license,
+    filesMatching("quilt.mod.json") {
+        expand 'version': project.version, 'quilt_mc_version_range': project.quilt_mc_version_range, 'license': project.license,
                 'mod_id': project.mod_id, 'mod_author': project.mod_author, 'mod_description': project.mod_description,
-                'mod_name': project.mod_name, 'issue_tracker': project.issue_tracker
+                'mod_name': project.mod_name
     }
 
     filesMatching("pack.mcmeta") {
@@ -87,7 +91,7 @@ curseforge {
         changelogType = 'markdown'
         changelog = file("../CHANGELOG_LATEST.md")
         addGameVersion "Java 17"
-        addGameVersion "Fabric"
+        addGameVersion "Quilt"
         "${release_versions}".split(',').each {
             addGameVersion "${it}"
         }
@@ -95,7 +99,7 @@ curseforge {
         mainArtifact(file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar"))
 
         relations {
-            requiredDependency 'fabric-api'
+            requiredDependency 'qsl'
             requiredDependency 'trinkets'
         }
 
@@ -117,8 +121,9 @@ modrinth {
     uploadFile = file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar")
     additionalFiles = [sourcesJar]
     gameVersions = "${release_versions}".split(",") as List<String>
+    loaders = ["quilt"]
     dependencies {
-        required.project 'fabric-api'
+        required.project 'qsl'
         required.project 'trinkets'
     }
 }
