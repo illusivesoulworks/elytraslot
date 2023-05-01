@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 Prior to version 6.0.0, this project used MCVERSION-MAJORMOD.MAJORAPI.MINOR.PATCH.
 
+## [6.1.1+1.19.2] - 2023.04.30
+### Fixed
+- Fixed potential crash in certain environments [#73](https://github.com/illusivesoulworks/elytraslot/issues/73)
+
 ## [6.1.0+1.19.2] - 2023.02.01
 ### Added
 - Added Lil' Wings compatibility [#62](https://github.com/illusivesoulworks/elytraslot/issues/62)

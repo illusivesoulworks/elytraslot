@@ -21,7 +21,6 @@ import com.illusivesoulworks.elytraslot.ElytraSlotCommonMod;
 import com.illusivesoulworks.elytraslot.platform.Services;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import java.awt.Color;
 import javax.annotation.Nonnull;
 import net.minecraft.client.model.ElytraModel;
 import net.minecraft.client.model.EntityModel;
@@ -90,13 +89,9 @@ public class ElytraSlotLayer<T extends LivingEntity, M extends EntityModel<T>>
       VertexConsumer vertexconsumer =
           ItemRenderer.getArmorFoilBuffer(buffer, RenderType.armorCutoutNoCull(resourcelocation),
               false, elytra.enchanted());
-      Color color = elytra.color();
-      float red = color.getRed() / 255.0F;
-      float green = color.getGreen() / 255.0F;
-      float blue = color.getBlue() / 255.0F;
-      float alpha = color.getAlpha() / 255.0F;
+      ElytraColor color = elytra.color();
       this.elytraModel.renderToBuffer(poseStack, vertexconsumer, light, OverlayTexture.NO_OVERLAY,
-          red, green, blue, alpha);
+          color.red(), color.green(), color.blue(), color.alpha());
       poseStack.popPose();
     });
   }
