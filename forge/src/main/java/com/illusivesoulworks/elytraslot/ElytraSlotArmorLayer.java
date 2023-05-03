@@ -68,7 +68,7 @@ public class ElytraSlotArmorLayer<T extends LivingEntity, M extends HumanoidMode
       if (elytra.stack().getItem() instanceof ArmorItem armoritem) {
         EquipmentSlot slot = EquipmentSlot.CHEST;
 
-        if (armoritem.getSlot() == slot) {
+        if (armoritem.getEquipmentSlot() == slot) {
           A originalModel = this.getArmorModel(slot);
           this.getParentModel().copyPropertiesTo(originalModel);
           this.setPartVisibility(originalModel, slot);

@@ -17,10 +17,9 @@
 
 package com.illusivesoulworks.elytraslot.client;
 
-import java.awt.Color;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
-public record ElytraRenderResult(Color color, ResourceLocation texture, boolean enchanted,
+public record ElytraRenderResult(ElytraColor color, ResourceLocation texture, boolean enchanted,
                                  ItemStack stack, boolean useCapeTexture) {
 }
