@@ -56,9 +56,9 @@ public class SimpleCompatibilityProvider implements IElytraProvider {
         ID_TO_TEXTURE.put("alexsmobs:tarantula_hawk_elytra", new ResourceLocation(""));
       }
 
-      if (isLoaded.test("mana-and-artifice")) {
-        ID_TO_TEXTURE.put("mana-and-artifice:spectral_elytra",
-            new ResourceLocation("mana-and-artifice:textures/entity/elytra.png"));
+      if (isLoaded.test("mna")) {
+        ID_TO_TEXTURE.put("mna:spectral_elytra",
+            new ResourceLocation("mna:textures/entity/elytra.png"));
       }
 
       if (isLoaded.test("netherelytra")) {
