@@ -1,29 +1,20 @@
-buildscript {
-    repositories {
-        maven { url = 'https://maven.minecraftforge.net' }
-		maven { url = 'https://plugins.gradle.org/m2/' }
-		maven {
-            name = 'ParchmentMC'
-            url = 'https://maven.parchmentmc.org/'
-        }
-        mavenCentral()
-    }
-    dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
-        classpath group: 'org.parchmentmc', name: 'librarian', version: '1.+'
-        classpath group: 'gradle.plugin.com.matthewprenger', name: 'CurseGradle', version: '1.4.0'
-        classpath group: 'com.modrinth.minotaur', name: 'Minotaur', version: '2.+'
-    }
+plugins {
+    id 'eclipse'
+    id 'idea'
+    id 'maven-publish'
+    id 'net.minecraftforge.gradle' version '[6.0,6.2)'
+    id 'org.parchmentmc.librarian.forgegradle' version '1.+'
+    id 'com.modrinth.minotaur' version '2.+'
+    id 'org.spongepowered.mixin' version '0.7.+'
+    id 'net.darkhax.curseforgegradle' version '1.+'
 }
-apply plugin: 'java'
-apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'eclipse'
-apply plugin: 'maven-publish'
-apply plugin: 'org.parchmentmc.librarian.forgegradle'
-apply plugin: 'com.matthewprenger.cursegradle'
-apply plugin: 'com.modrinth.minotaur'
 
-archivesBaseName = "${mod_id}-forge"
+version = "${version}"
+group = "top.theillusivec4.${mod_id}"
+
+base {
+    archivesName = "${mod_id}-forge"
+}
 
 minecraft {
     mappings channel: 'parchment', version: "${parchment_mc_version}-${parchment_version}-${minecraft_version}"
@@ -97,8 +88,7 @@ dependencies {
     compileOnly project(":common")
     compileOnly "curse.maven:mccapes-359836:${mccapes_cf_file_id}"
 
-    runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}")
-    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}:api")
+    implementation fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}")
 
     runtimeOnly fg.deobf("top.theillusivec4.caelus:caelus-forge:${caelus_version}")
     compileOnly fg.deobf("top.theillusivec4.caelus:caelus-forge:${caelus_version}:api")
@@ -108,29 +98,22 @@ tasks.withType(JavaCompile) {
     source(project(":common").sourceSets.main.allSource)
 }
 
-def replaceResources = tasks.register("replaceResources", Copy) {
-    it.outputs.upToDateWhen { false }
-
-    it.from(sourceSets.main.resources) {
-        include "META-INF/mods.toml"
-        expand 'version': version, 'forge_mc_version_range': forge_mc_version_range, 'forge_version_range': forge_version_range,
-                'license': license, 'mod_id': mod_id, 'mod_author': mod_author, 'mod_description': mod_description,
-                'mod_name': mod_name, 'issue_tracker': issue_tracker, 'curios_version_range': curios_version_range,
-                'caelus_version_range': caelus_version_range
-    }
-    it.from(project(":common").sourceSets.main.resources) {
-        include "pack.mcmeta"
-        expand 'mod_name': mod_name
-    }
-    it.into "$buildDir/resources/main/"
-}
-
+def resourceTargets = ['META-INF/mods.toml', 'pack.mcmeta', '*.mixins.json']
+def replaceProperties = [
+        forge_version: forge_version, forge_version_range: forge_version_range, version: version,
+        forge_mc_version_range: forge_mc_version_range, license: license, mod_id: mod_id, mod_author: mod_author,
+        mod_description: mod_description, mod_name: mod_name, issue_tracker: issue_tracker, refmap_target: "${mod_id}.",
+		'curios_version_range': curios_version_range, 'caelus_version_range': caelus_version_range
+]
 processResources {
     from project(":common").sourceSets.main.resources
     duplicatesStrategy(DuplicatesStrategy.FAIL)
-    exclude('META-INF/mods.toml')
-    exclude('pack.mcmeta')
-    configure { finalizedBy(replaceResources) }
+    inputs.properties replaceProperties
+    replaceProperties.put 'project', project
+
+    filesMatching(resourceTargets) {
+        expand replaceProperties
+    }
 }
 
 jar.finalizedBy('reobfJar')
@@ -151,23 +134,19 @@ publishing {
     }
 }
 
-curseforge {
-    project {
-        apiKey = findProperty('curseKey') ?: 0
-        id = "${cf_id}"
-        releaseType = "${release_type}"
-        changelogType = 'markdown'
-        changelog = file("../CHANGELOG_LATEST.md")
-        addArtifact(sourcesJar)
-        "${release_versions}".split(',').each {
-            addGameVersion "${it}"
-        }
-
-        relations {
-            requiredDependency 'curios'
-            requiredDependency 'caelus'
-        }
+task publishCurseForge(type: net.darkhax.curseforgegradle.TaskPublishCurseForge) {
+    apiToken = findProperty('curseKey')
+    def projectId = "${cf_id}".toString()
+    def mainFile = upload(projectId, file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar"))
+    mainFile.changelogType = 'markdown'
+    mainFile.changelog = file('../CHANGELOG_LATEST.md')
+    mainFile.releaseType = "${release_type}"
+    "${release_versions}".split(',').each {
+        mainFile.addGameVersion("${it}")
     }
+	mainFile.addRequirement("curios")
+	mainFile.addRequirement("caelus")
+    mainFile.withAdditionalFile(sourcesJar)
 }
 
 modrinth {

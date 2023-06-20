@@ -39,7 +39,7 @@ public class ElytraSlotQuiltMod implements ModInitializer {
       public void tick(ItemStack stack, SlotReference slot, LivingEntity entity) {
         int nextRoll = entity.getFallFlyingTicks() + 1;
 
-        if (!entity.getLevel().isClientSide() && nextRoll % 10 == 0) {
+        if (!entity.level().isClientSide() && nextRoll % 10 == 0) {
 
           if ((nextRoll / 10) % 2 == 0) {
             stack.hurtAndBreak(1, entity, p -> TrinketsApi.onTrinketBroken(stack, slot, entity));

@@ -25,7 +25,7 @@ import net.minecraftcapes.player.PlayerHandler;
 public class MinecraftCapesPlugin {
 
   public static ResourceLocation getCustomCape(Player player) {
-    PlayerHandler playerHandler = PlayerHandler.getFromPlayer(player);
+    PlayerHandler playerHandler = PlayerHandler.get(player);
 
     if (playerHandler.getCapeLocation() != null && MinecraftCapesConfig.isCapeVisible()) {
       return playerHandler.getCapeLocation();

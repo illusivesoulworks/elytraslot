@@ -50,7 +50,6 @@ public class ElytraSlotForgeMod {
   public ElytraSlotForgeMod() {
     ElytraSlotCommonMod.init();
     IEventBus eventBus = FMLJavaModLoadingContext.get().getModEventBus();
-    eventBus.addListener(this::enqueue);
     eventBus.addListener(this::clientSetup);
     eventBus.addListener(this::setup);
   }
@@ -62,11 +61,6 @@ public class ElytraSlotForgeMod {
 
   private void clientSetup(final FMLClientSetupEvent evt) {
     ElytraSlotForgeClientMod.setup();
-  }
-
-  private void enqueue(final InterModEnqueueEvent evt) {
-    InterModComms.sendTo(CuriosApi.MODID, SlotTypeMessage.REGISTER_TYPE,
-        () -> SlotTypePreset.BACK.getMessageBuilder().build());
   }
 
   private void playerTick(final TickEvent.PlayerTickEvent evt) {

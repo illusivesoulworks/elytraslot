@@ -2,7 +2,7 @@ plugins {
     id 'org.quiltmc.loom' version '1.+'
     id 'maven-publish'
     id 'idea'
-	id 'com.matthewprenger.cursegradle' version '1.4.0'
+    id 'net.darkhax.curseforgegradle' version '1.+'
     id 'com.modrinth.minotaur' version '2.+'
 }
 
@@ -54,7 +54,7 @@ processResources {
     filesMatching("quilt.mod.json") {
         expand 'version': project.version, 'quilt_mc_version_range': project.quilt_mc_version_range, 'license': project.license,
                 'mod_id': project.mod_id, 'mod_author': project.mod_author, 'mod_description': project.mod_description,
-                'mod_name': project.mod_name
+                'mod_name': project.mod_name, 'issue_tracker': project.issue_tracker
     }
 
     filesMatching("pack.mcmeta") {
@@ -83,33 +83,19 @@ publishing {
     }
 }
 
-curseforge {
-    project {
-        apiKey = findProperty('curseKey') ?: 0
-        id = "${cf_id}"
-        releaseType = "${release_type}"
-        changelogType = 'markdown'
-        changelog = file("../CHANGELOG_LATEST.md")
-        addGameVersion "Java 17"
-        addGameVersion "Quilt"
-        "${release_versions}".split(',').each {
-            addGameVersion "${it}"
-        }
-        addArtifact(sourcesJar)
-        mainArtifact(file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar"))
-
-        relations {
-            requiredDependency 'qsl'
-            requiredDependency 'trinkets'
-        }
-
-        afterEvaluate {
-            uploadTask.dependsOn(remapJar)
-        }
+task publishCurseForge(type: net.darkhax.curseforgegradle.TaskPublishCurseForge) {
+    apiToken = findProperty('curseKey')
+    def projectId = "${cf_id}".toString()
+    def mainFile = upload(projectId, file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar"))
+    mainFile.changelogType = 'markdown'
+    mainFile.changelog = file('../CHANGELOG_LATEST.md')
+    mainFile.releaseType = "${release_type}"
+    "${release_versions}".split(',').each {
+        mainFile.addGameVersion("${it}")
     }
-    options {
-        forgeGradleIntegration = false
-    }
+    mainFile.addRequirement("qsl")
+    mainFile.addRequirement("trinkets")
+    mainFile.withAdditionalFile(sourcesJar)
 }
 
 modrinth {
