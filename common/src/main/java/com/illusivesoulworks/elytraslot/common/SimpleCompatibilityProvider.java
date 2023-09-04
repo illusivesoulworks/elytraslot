@@ -67,6 +67,11 @@ public class SimpleCompatibilityProvider implements IElytraProvider {
             new ResourceLocation("netherelytra:textures/entity/netherite_elytra.png"));
       }
 
+      if (isLoaded.test("mythicmetals")) {
+        ID_TO_TEXTURE.put("mythicmetals:celestium_elytra",
+            new ResourceLocation("mythicmetals:textures/models/celestium_elytra.png"));
+      }
+
       if (isLoaded.test("lilwings")) {
         Set<ResourceLocation> entityTypes = Services.PLATFORM.getEntityTypes();
 
@@ -104,7 +109,7 @@ public class SimpleCompatibilityProvider implements IElytraProvider {
           "soul_butterfly_elytra",
         };
 
-        for (String clutterElytra: clutterElytras) {
+        for (String clutterElytra : clutterElytras) {
           ID_TO_TEXTURE.put("clutter:" + clutterElytra,
                   new ResourceLocation("clutter", "textures/entity/" + clutterElytra + ".png"));
         }

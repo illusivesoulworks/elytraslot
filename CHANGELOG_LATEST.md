@@ -2,6 +2,6 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) a
 
 This is a copy of the changelog for the most recent version. For the full version history, go [here](https://github.com/illusivesoulworks/elytraslot/blob/1.20.x/CHANGELOG.md).
 
-## [6.3.1+1.20.1] - 2023.07.24
+## [6.3.2+1.20.1] - 2023.09.05
 ### Added
-- Added Clutter compatibility
+- Added Mythic Metals compatibility [#79](https://github.com/illusivesoulworks/elytraslot/issues/79) 

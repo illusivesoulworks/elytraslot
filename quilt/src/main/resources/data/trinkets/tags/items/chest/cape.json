@@ -141,6 +141,10 @@
     {
       "id": "clutter:soul_butterfly_elytra",
       "required": false
+    },
+    {
+      "id": "mythicmetals:celestium_elytra",
+      "required": false
     }
   ]
 }
