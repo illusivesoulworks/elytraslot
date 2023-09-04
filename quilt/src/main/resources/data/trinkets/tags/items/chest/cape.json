@@ -65,6 +65,86 @@
     {
       "id": "lilwings:grayling_blooming_elytra",
       "required": false
+    },
+    {
+      "id": "clutter:white_butterfly_elytra",
+      "required": false
+    },
+    {
+      "id": "clutter:light_gray_butterfly_elytra",
+      "required": false
+    },
+    {
+      "id": "clutter:gray_butterfly_elytra",
+      "required": false
+    },
+    {
+      "id": "clutter:black_butterfly_elytra",
+      "required": false
+    },
+    {
+      "id": "clutter:brown_butterfly_elytra",
+      "required": false
+    },
+    {
+      "id": "clutter:red_butterfly_elytra",
+      "required": false
+    },
+    {
+      "id": "clutter:orange_butterfly_elytra",
+      "required": false
+    },
+    {
+      "id": "clutter:white_yellow_elytra",
+      "required": false
+    },
+    {
+      "id": "clutter:lime_butterfly_elytra",
+      "required": false
+    },
+    {
+      "id": "clutter:green_butterfly_elytra",
+      "required": false
+    },
+    {
+      "id": "clutter:cyan_butterfly_elytra",
+      "required": false
+    },
+    {
+      "id": "clutter:light_blue_butterfly_elytra",
+      "required": false
+    },
+    {
+      "id": "clutter:blue_butterfly_elytra",
+      "required": false
+    },
+    {
+      "id": "clutter:purple_butterfly_elytra",
+      "required": false
+    },
+    {
+      "id": "clutter:magenta_butterfly_elytra",
+      "required": false
+    },
+    {
+      "id": "clutter:pink_butterfly_elytra",
+      "required": false
+    },
+    {
+      "id": "clutter:crimson_butterfly_elytra",
+      "required": false
+    },
+    {
+      "id": "clutter:warped_butterfly_elytra",
+      "required": false
+    },
+    {
+      "id": "clutter:soul_butterfly_elytra",
+      "required": false
+    },
+    {
+      "id": "mythicmetals:celestium_elytra",
+      "required": false
     }
   ]
 }
