@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/) and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 Prior to version 6.0.0, this project used MCVERSION-MAJORMOD.MAJORAPI.MINOR.PATCH.
 
+## [10.0.0+1.21.4] - 2025.06.20
+### Added
+- Native compatibility with all items that use the `minecraft:glider` data component
+### Changed
+- Updated to Minecraft 1.21.4
+
 ## [9.0.2+1.21.1] - 2024.10.02
 ### Fixed
 - Fixed crash with Deeper and Darker integration [#136](https://github.com/illusivesoulworks/elytraslot/issues/136)
