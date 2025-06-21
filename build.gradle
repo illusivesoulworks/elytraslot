@@ -3,9 +3,9 @@ import java.nio.charset.StandardCharsets
 
 plugins {
     // see https://fabricmc.net/develop/ for new versions
-    id 'fabric-loom' version '1.7-SNAPSHOT' apply false
+    id 'fabric-loom' version '1.10-SNAPSHOT' apply false
     // see https://projects.neoforged.net/neoforged/moddevgradle for new versions
-    id 'net.neoforged.moddev' version '0.1.110' apply false
+    id 'net.neoforged.moddev' version '2.0.89' apply false
 }
 
 def publishDiscord() {
@@ -16,10 +16,6 @@ def publishDiscord() {
             cfLinks.add("[Fabric](${project(':fabric').findProperty('curse_link')})")
         }
 
-//        if (project(':forge').hasProperty('curse_link')) {
-//            cfLinks.add("[Forge](${project(':forge').findProperty('curse_link')})")
-//        }
-
         if (project(':neoforge').hasProperty('curse_link')) {
             cfLinks.add("[NeoForge](${project(':neoforge').findProperty('curse_link')})")
         }
@@ -28,10 +24,6 @@ def publishDiscord() {
         if (project(':fabric').hasProperty('modrinth_link')) {
             modrinthLinks.add("[Fabric](${project(':fabric').findProperty('modrinth_link')})")
         }
-
-//        if (project(':forge').hasProperty('modrinth_link')) {
-//            modrinthLinks.add("[Forge](${project(':forge').findProperty('modrinth_link')})")
-//        }
 
         if (project(':neoforge').hasProperty('curse_link')) {
             modrinthLinks.add("[NeoForge](${project(':neoforge').findProperty('modrinth_link')})")
@@ -88,7 +80,7 @@ def publishDiscord() {
             }
             """
         println(message)
-        final URL url = new URL("${discordWebhook}")
+        final URL url = URI.create("${System.getenv('DISCORD_WEBHOOK')}").toURL()
         final HttpsURLConnection connection = (HttpsURLConnection) url.openConnection()
         connection.addRequestProperty("Content-Type", "application/json; charset=UTF-8")
         connection.addRequestProperty("User-Agent", "${mod_name} Gradle Upload")
@@ -122,14 +114,6 @@ tasks.register('publishFabric') {
     }
 }
 
-//tasks.register('publishForge') {
-//    dependsOn ordered(':forge:modrinth', ':forge:publishCurseForge')
-//
-//    doLast {
-//        publishDiscord()
-//    }
-//}
-
 tasks.register('publishNeoForge') {
     dependsOn ordered(':neoforge:modrinth', ':neoforge:publishCurseForge')
 
@@ -138,22 +122,6 @@ tasks.register('publishNeoForge') {
     }
 }
 
-//tasks.register('publishFabricForge') {
-//    dependsOn ordered(':forge:modrinth', 'forge:publishCurseForge', ':fabric:modrinth', ':fabric:publishCurseForge')
-//
-//    doLast {
-//        publishDiscord()
-//    }
-//}
-
-//tasks.register('publishForgeNeoForge') {
-//    dependsOn ordered(':forge:modrinth', ':forge:publishCurseForge', ':neoforge:modrinth', ':neoforge:publishCurseForge')
-//
-//    doLast {
-//        publishDiscord()
-//    }
-//}
-
 tasks.register('publishFabricNeoForge') {
     dependsOn ordered(':fabric:modrinth', ':fabric:publishCurseForge', ':neoforge:modrinth', ':neoforge:publishCurseForge')
 
@@ -161,11 +129,3 @@ tasks.register('publishFabricNeoForge') {
         publishDiscord()
     }
 }
-
-//tasks.register('publishFabricForgeNeoForge') {
-//    dependsOn ordered(':forge:modrinth', ':forge:publishCurseForge', ':fabric:modrinth', ':fabric:publishCurseForge', ':neoforge:modrinth', ':neoforge:publishCurseForge')
-//
-//    doLast {
-//        publishDiscord()
-//    }
-//}

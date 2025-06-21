@@ -18,24 +18,57 @@
 package com.illusivesoulworks.elytraslot;
 
 import com.illusivesoulworks.elytraslot.client.ElytraSlotLayer;
-import com.illusivesoulworks.elytraslot.common.integration.deeperdarker.DeeperDarkerClientPlugin;
-import com.illusivesoulworks.elytraslot.platform.Services;
+import io.wispforest.accessories.api.AccessoriesCapability;
+import io.wispforest.accessories.api.equip.EquipmentChecking;
+import io.wispforest.accessories.api.slot.SlotEntryReference;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRenderEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.LivingEntityFeatureRendererRegistrationCallback;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.entity.ArmorStandRenderer;
+import net.minecraft.client.renderer.entity.RenderLayerParent;
+import net.minecraft.client.renderer.entity.player.PlayerRenderer;
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 
 public class ElytraSlotFabricClientMod implements ClientModInitializer {
 
   @Override
   public void onInitializeClient() {
     LivingEntityFeatureRenderEvents.ALLOW_CAPE_RENDER.register(
-        player -> !ElytraSlotCommonMod.isEquipped(player));
-    LivingEntityFeatureRendererRegistrationCallback.EVENT.register(
-        (entityType, entityRenderer, registrationHelper, context) -> registrationHelper.register(
-            new ElytraSlotLayer<>(entityRenderer, context.getModelSet())));
+        playerRenderState -> {
+          ClientLevel level = Minecraft.getInstance().level;
 
-    if (Services.PLATFORM.isModLoaded("deeperdarker")) {
-      DeeperDarkerClientPlugin.setup();
-    }
+          if (level != null) {
+            Entity entity = level.getEntity(playerRenderState.id);
+
+            if (entity instanceof LivingEntity livingEntity) {
+              AccessoriesCapability cap = AccessoriesCapability.get(livingEntity);
+
+              if (cap != null) {
+                SlotEntryReference ref = cap.getFirstEquipped(s -> s.has(DataComponents.GLIDER),
+                                                              EquipmentChecking.COSMETICALLY_OVERRIDABLE);
+
+                return ref == null || ref.stack().isEmpty();
+              }
+            }
+          }
+          return true;
+        });
+    LivingEntityFeatureRendererRegistrationCallback.EVENT.register(
+        (entityType, entityRenderer, registrationHelper, context) -> {
+
+          if (entityRenderer instanceof PlayerRenderer
+              || entityRenderer instanceof ArmorStandRenderer) {
+            registrationHelper.register(
+                new ElytraSlotLayer<>(
+                    (RenderLayerParent<HumanoidRenderState, EntityModel<HumanoidRenderState>>) entityRenderer,
+                    context.getModelSet(), context.getEquipmentRenderer()));
+          }
+        });
   }
 }

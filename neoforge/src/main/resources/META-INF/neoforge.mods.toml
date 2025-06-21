@@ -14,7 +14,7 @@ description='''
 ${description}
 '''
 [[mixins]]
-    config = "${mod_id}-integrations.mixins.json"
+    config = "${mod_id}_integrations.mixins.json"
 [[dependencies.${mod_id}]]
     modId="neoforge"
     type="required"

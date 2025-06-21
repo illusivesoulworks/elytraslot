@@ -17,87 +17,91 @@
 
 package com.illusivesoulworks.elytraslot.client;
 
-import com.illusivesoulworks.elytraslot.ElytraSlotCommonMod;
+import com.illusivesoulworks.elytraslot.integration.IntegrationConstants;
+import com.illusivesoulworks.elytraslot.integration.minecraftcapes.MinecraftCapesPlugin;
+import com.illusivesoulworks.elytraslot.platform.ClientServices;
 import com.illusivesoulworks.elytraslot.platform.Services;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import net.minecraft.client.model.ElytraModel;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.model.geom.ModelLayers;
-import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
+import net.minecraft.client.renderer.entity.layers.EquipmentLayerRenderer;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
-import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
+import net.minecraft.client.renderer.entity.state.PlayerRenderState;
 import net.minecraft.client.resources.PlayerSkin;
+import net.minecraft.client.resources.model.EquipmentClientInfo;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.PlayerModelPart;
-import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.equipment.Equippable;
 
-public class ElytraSlotLayer<T extends LivingEntity, M extends EntityModel<T>>
-    extends RenderLayer<T, M> {
+public class ElytraSlotLayer<S extends HumanoidRenderState, M extends EntityModel<S>>
+    extends RenderLayer<S, M> {
 
-  private final ElytraModel<T> elytraModel;
+  private final ElytraModel elytraModel;
+  private final ElytraModel elytraBabyModel;
+  private final EquipmentLayerRenderer equipmentRenderer;
 
-  public ElytraSlotLayer(RenderLayerParent<T, M> layerParent, EntityModelSet modelSet) {
-    super(layerParent);
-    this.elytraModel = new ElytraModel<>(modelSet.bakeLayer(ModelLayers.ELYTRA));
+  public ElytraSlotLayer(RenderLayerParent<S, M> renderer, EntityModelSet models,
+                         EquipmentLayerRenderer equipmentRenderer) {
+    super(renderer);
+    this.elytraModel = new ElytraModel(models.bakeLayer(ModelLayers.ELYTRA));
+    this.elytraBabyModel = new ElytraModel(models.bakeLayer(ModelLayers.ELYTRA_BABY));
+    this.equipmentRenderer = equipmentRenderer;
   }
 
-  public void render(@Nonnull PoseStack poseStack, @Nonnull MultiBufferSource buffer,
-                     int light, @Nonnull T livingEntity, float limbSwing, float limbSwingAmount,
-                     float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
-    ElytraSlotCommonMod.getElytraRender(livingEntity).ifPresent(elytra -> {
-      ResourceLocation resourcelocation;
+  public void render(@Nonnull PoseStack poseStack, @Nonnull MultiBufferSource bufferSource,
+                     int packedLight, @Nonnull S renderState, float p_371865_, float p_371528_) {
+    ItemStack elytra = ClientServices.CLIENT.getRenderingElytra(renderState);
 
-      if (elytra.stack().getItem() instanceof ArmorItem) {
-        return;
+    if (!elytra.isEmpty() && renderState.chestEquipment.getItem() != Items.ELYTRA) {
+      Equippable equippable = elytra.get(DataComponents.EQUIPPABLE);
+
+      if (equippable != null && equippable.assetId().isPresent()) {
+        ResourceLocation resourcelocation = getPlayerElytraTexture(renderState);
+        ElytraModel elytramodel = renderState.isBaby ? this.elytraBabyModel : this.elytraModel;
+        poseStack.pushPose();
+        poseStack.translate(0.0F, 0.0F, 0.125F);
+        elytramodel.setupAnim(renderState);
+        this.equipmentRenderer
+            .renderLayers(
+                EquipmentClientInfo.LayerType.WINGS, equippable.assetId().get(), elytramodel,
+                elytra, poseStack, bufferSource, packedLight, resourcelocation
+            );
+        poseStack.popPose();
+      }
+    }
+  }
+
+  @Nullable
+  private static ResourceLocation getPlayerElytraTexture(HumanoidRenderState renderState) {
+
+    if (renderState instanceof PlayerRenderState playerrenderstate) {
+      PlayerSkin playerskin = playerrenderstate.skin;
+
+      if (playerskin.elytraTexture() != null) {
+        return playerskin.elytraTexture();
       }
 
-      if (livingEntity instanceof AbstractClientPlayer abstractclientplayer) {
-        PlayerSkin playerSkin = abstractclientplayer.getSkin();
+      if (Services.SERVER.isModLoaded(IntegrationConstants.MINECRAFT_CAPES)) {
+        ResourceLocation resourceLocation = MinecraftCapesPlugin.getCapeLocation(playerrenderstate);
 
-        if (playerSkin.elytraTexture() != null) {
-          resourcelocation = playerSkin.elytraTexture();
-        } else if (elytra.useCapeTexture()) {
-
-          if (Services.PLATFORM.isModLoaded("minecraftcapes") &&
-              Services.CLIENT.hasCustomCape(abstractclientplayer)) {
-            resourcelocation = Services.CLIENT.getCustomCape(abstractclientplayer);
-          } else if (playerSkin.capeTexture() != null &&
-              abstractclientplayer.isModelPartShown(PlayerModelPart.CAPE)) {
-            resourcelocation = playerSkin.capeTexture();
-          } else {
-            resourcelocation = elytra.texture();
-          }
-        } else {
-          resourcelocation = elytra.texture();
+        if (resourceLocation != null) {
+          return resourceLocation;
         }
-      } else {
-        resourcelocation = elytra.texture();
       }
-      poseStack.pushPose();
-      poseStack.translate(0.0D, 0.0D, 0.125D);
-      this.getParentModel().copyPropertiesTo(this.elytraModel);
-      this.elytraModel.setupAnim(livingEntity, limbSwing, limbSwingAmount, ageInTicks,
-          netHeadYaw, headPitch);
-      VertexConsumer vertexconsumer =
-          ItemRenderer.getArmorFoilBuffer(buffer, RenderType.armorCutoutNoCull(resourcelocation),
-              elytra.enchanted());
-      ElytraColor color = elytra.color();
-      int alpha = (int) (color.alpha() * 255);
-      int red = (int) (color.red() * 255);
-      int green = (int) (color.green() * 255);
-      int blue = (int) (color.blue() * 255);
-      int argb = (alpha << 24) | (red << 16) | (green << 8) | blue;
-      this.elytraModel.renderToBuffer(poseStack, vertexconsumer, light, OverlayTexture.NO_OVERLAY,
-          argb);
-      poseStack.popPose();
-    });
+
+      if (playerskin.capeTexture() != null && playerrenderstate.showCape) {
+        return playerskin.capeTexture();
+      }
+    }
+    return null;
   }
 }

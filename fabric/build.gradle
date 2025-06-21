@@ -7,6 +7,13 @@ plugins {
     id 'net.darkhax.curseforgegradle' version '1.+'
 }
 
+repositories {
+    maven { url 'https://maven.wispforest.io/releases' }
+    maven { url 'https://maven.su5ed.dev/releases' }
+    maven { url 'https://maven.fabricmc.net' }
+    maven { url 'https://maven.shedaniel.me/' }
+}
+
 dependencies {
     minecraft "com.mojang:minecraft:${minecraft_version}"
     mappings(loom.layered {
@@ -15,14 +22,15 @@ dependencies {
     })
     modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_version}"
-    modImplementation "dev.emi:trinkets:${trinkets_version}"
+    modImplementation("io.wispforest:accessories-fabric:${accessories_version}")
+    // modImplementation "dev.emi:trinkets:${trinkets_version}"
 
     modRuntimeOnly("com.terraformersmc:modmenu:${mod_menu_version}") {
         transitive = false
     }
     implementation group: 'com.google.code.findbugs', name: 'jsr305', version: '3.0.1'
 
-    modCompileOnly "curse.maven:deeperdarker-659011:5727329"
+    modCompileOnly "curse.maven:mccapes-359836:${mccapes_cf_file_id}"
 }
 
 loom {
@@ -50,7 +58,7 @@ loom {
 }
 
 tasks.register('publishCurseForge', TaskPublishCurseForge) {
-    apiToken = findProperty('curseKey')
+    apiToken = "${System.getenv('CURSEFORGE_KEY')}"
     def projectId = "${cf_id}".toString()
     def mainFile = upload(projectId, file("${project.buildDir}/libs/${archivesBaseName}-${version}.jar"))
     mainFile.changelogType = 'markdown'
@@ -60,7 +68,7 @@ tasks.register('publishCurseForge', TaskPublishCurseForge) {
         mainFile.addGameVersion("${it}")
     }
     mainFile.addRequirement("fabric-api")
-    mainFile.addRequirement("trinkets")
+    mainFile.addRequirement("accessories")
     mainFile.withAdditionalFile(sourcesJar)
 
     doLast {
@@ -72,7 +80,7 @@ tasks.register('publishCurseForge', TaskPublishCurseForge) {
 }
 
 modrinth {
-    token = findProperty('modrinthKey') ?: 0
+    token = "${System.getenv('MODRINTH_KEY')}" ?: ""
     projectId = "${modrinth_id}"
     versionName = getArchivesBaseName() + "-" + getVersion()
     versionType = "${release_type}"
@@ -82,7 +90,7 @@ modrinth {
     gameVersions = "${release_versions}".split(",") as List<String>
     dependencies {
         required.project 'fabric-api'
-        required.project 'trinkets'
+        required.project 'accessories'
     }
 }
 

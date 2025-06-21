@@ -18,18 +18,43 @@
 package com.illusivesoulworks.elytraslot.platform;
 
 import com.illusivesoulworks.elytraslot.platform.services.IClientPlatform;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Player;
+import io.wispforest.accessories.api.AccessoriesCapability;
+import io.wispforest.accessories.api.equip.EquipmentChecking;
+import io.wispforest.accessories.api.slot.SlotEntryReference;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
+import net.minecraft.client.renderer.entity.state.PlayerRenderState;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
 
 public class FabricClientPlatform implements IClientPlatform {
 
   @Override
-  public boolean hasCustomCape(Player player) {
-    return false;
-  }
+  public ItemStack getRenderingElytra(HumanoidRenderState humanoidRenderState) {
 
-  @Override
-  public ResourceLocation getCustomCape(Player player) {
-    return null;
+    if (humanoidRenderState instanceof PlayerRenderState playerRenderState) {
+      ClientLevel level = Minecraft.getInstance().level;
+
+      if (level != null) {
+        Entity entity = level.getEntity(playerRenderState.id);
+
+        if (entity instanceof LivingEntity livingEntity) {
+          AccessoriesCapability cap = AccessoriesCapability.get(livingEntity);
+
+          if (cap != null) {
+            SlotEntryReference ref = cap.getFirstEquipped(s -> s.has(DataComponents.GLIDER),
+                                                          EquipmentChecking.COSMETICALLY_OVERRIDABLE);
+
+            if (ref != null) {
+              return ref.stack();
+            }
+          }
+        }
+      }
+    }
+    return ItemStack.EMPTY;
   }
 }

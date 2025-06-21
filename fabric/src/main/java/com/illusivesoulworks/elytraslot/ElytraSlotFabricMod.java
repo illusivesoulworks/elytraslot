@@ -17,65 +17,74 @@
 
 package com.illusivesoulworks.elytraslot;
 
-import com.illusivesoulworks.elytraslot.common.integration.deeperdarker.DeeperDarkerPlugin;
-import com.illusivesoulworks.elytraslot.platform.Services;
-import dev.emi.trinkets.api.SlotReference;
-import dev.emi.trinkets.api.Trinket;
-import dev.emi.trinkets.api.TrinketsApi;
+import com.illusivesoulworks.elytraslot.common.AccessoryElytra;
+import io.wispforest.accessories.api.AccessoriesCapability;
+import io.wispforest.accessories.api.AccessoryRegistry;
+import io.wispforest.accessories.api.slot.SlotEntryReference;
+import io.wispforest.accessories.api.slot.SlotPredicateRegistry;
+import java.util.List;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.entity.event.v1.EntityElytraEvents;
-import net.fabricmc.fabric.api.entity.event.v1.FabricElytraItem;
+import net.fabricmc.fabric.api.event.registry.RegistryEntryAddedCallback;
+import net.fabricmc.fabric.api.util.TriState;
+import net.minecraft.Util;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.level.gameevent.GameEvent;
 
 public class ElytraSlotFabricMod implements ModInitializer {
 
   @Override
   public void onInitialize() {
-    ElytraSlotCommonMod.init();
     EntityElytraEvents.CUSTOM.register((entity, tickElytra) -> {
-      if (ElytraSlotCommonMod.canFly(entity)) {
+      AccessoriesCapability cap = AccessoriesCapability.get(entity);
 
-        if (tickElytra) {
-          ItemStack stack = Services.ELYTRA.getEquipped(entity);
+      if (cap != null && entity.level() instanceof ServerLevel serverLevel) {
+        List<SlotEntryReference> entryReferences =
+            cap.getEquipped(s -> s.has(DataComponents.GLIDER));
 
-          if (stack.getItem() instanceof FabricElytraItem fabricElytraItem) {
-            return fabricElytraItem.useCustomElytra(entity, stack, true);
+        if (!entryReferences.isEmpty()) {
+          SlotEntryReference ref = Util.getRandom(entryReferences, entity.getRandom());
+          ItemStack stack = ref.stack();
+
+          if (!stack.isEmpty()) {
+
+            if (tickElytra) {
+              stack.hurtAndBreak(1, serverLevel,
+                                 entity instanceof ServerPlayer serverPlayer ? serverPlayer : null,
+                                 item -> ref.reference().breakStack());
+            }
+            return true;
           }
         }
-        return true;
       }
       return false;
     });
-    TrinketsApi.registerTrinket(Items.ELYTRA, new Trinket() {
+    SlotPredicateRegistry.register(
+        ResourceLocation.fromNamespaceAndPath(ElytraSlotConstants.MOD_ID, "glider"),
+        (level, slotType, index, stack) -> {
 
-      @Override
-      public void tick(ItemStack stack, SlotReference slot, LivingEntity entity) {
-        int nextRoll = entity.getFallFlyingTicks() + 1;
-
-        if (entity.level() instanceof ServerLevel serverLevel && nextRoll % 10 == 0) {
-
-          if ((nextRoll / 10) % 2 == 0) {
-            stack.hurtAndBreak(1, serverLevel,
-                entity instanceof ServerPlayer serverPlayer ? serverPlayer : null,
-                (item) -> TrinketsApi.onTrinketBroken(stack, slot, entity));
+          if (stack.has(DataComponents.GLIDER)) {
+            return TriState.TRUE;
           }
-          entity.gameEvent(GameEvent.ELYTRA_GLIDE);
-        }
-      }
+          return TriState.DEFAULT;
+        });
+    RegistryEntryAddedCallback.event(BuiltInRegistries.ITEM)
+        .register((i, resourceLocation, item) -> {
 
-      @Override
-      public boolean canEquip(ItemStack stack, SlotReference slot, LivingEntity entity) {
-        return ElytraSlotCommonMod.canEquip(entity);
-      }
-    });
+          if (item.getDefaultInstance().has(DataComponents.GLIDER)) {
+            AccessoryRegistry.register(item, new AccessoryElytra());
+          }
+        });
+    for (Item item : BuiltInRegistries.ITEM) {
 
-    if (Services.PLATFORM.isModLoaded("deeperdarker")) {
-      DeeperDarkerPlugin.setup();
+      if (item.getDefaultInstance().has(DataComponents.GLIDER)) {
+        AccessoryRegistry.register(item, new AccessoryElytra());
+      }
     }
   }
 }

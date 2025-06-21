@@ -17,20 +17,16 @@
 
 package com.illusivesoulworks.elytraslot.platform;
 
-import com.illusivesoulworks.elytraslot.common.integration.MinecraftCapesPlugin;
+import com.illusivesoulworks.elytraslot.ElytraSlotNeoForgeClientMod;
 import com.illusivesoulworks.elytraslot.platform.services.IClientPlatform;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
+import net.minecraft.world.item.ItemStack;
 
 public class NeoForgeClientPlatform implements IClientPlatform {
 
   @Override
-  public boolean hasCustomCape(Player player) {
-    return MinecraftCapesPlugin.getCustomCape(player) != null;
-  }
-
-  @Override
-  public ResourceLocation getCustomCape(Player player) {
-    return MinecraftCapesPlugin.getCustomCape(player);
+  public ItemStack getRenderingElytra(HumanoidRenderState humanoidRenderState) {
+    return humanoidRenderState.getRenderDataOrDefault(ElytraSlotNeoForgeClientMod.ELYTRA_RENDER,
+                                                      ItemStack.EMPTY);
   }
 }

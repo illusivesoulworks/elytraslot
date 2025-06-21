@@ -1,5 +1,6 @@
 package com.illusivesoulworks.elytraslot.mixin;
 
+import com.illusivesoulworks.elytraslot.integration.IntegrationConstants;
 import com.illusivesoulworks.elytraslot.platform.Services;
 import java.util.List;
 import java.util.Set;
@@ -21,15 +22,13 @@ public class IntegrationMixinPlugin implements IMixinConfigPlugin {
 
   @Override
   public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
+    return shouldApplyCompatibilityMixin(mixinClassName, IntegrationConstants.WAVEY_CAPES);
+  }
 
-    if (mixinClassName.startsWith("com.illusivesoulworks.elytraslot.mixin.integration.aileron")) {
-      return Services.LOADING.isModLoaded("aileron");
-    } else if (mixinClassName.startsWith("com.illusivesoulworks.elytraslot.mixin.integration.waveycapes")) {
-      return Services.LOADING.isModLoaded("waveycapes");
-    } else if (mixinClassName.startsWith("com.illusivesoulworks.elytraslot.mixin.integration.elytrabounce")) {
-      return Services.LOADING.isModLoaded("elytrabounce");
-    } else if (mixinClassName.startsWith("com.illusivesoulworks.elytraslot.mixin.integration.deeperdarker")) {
-      return Services.LOADING.isModLoaded("deeperdarker");
+  private static boolean shouldApplyCompatibilityMixin(String mixinClassName, String modId) {
+
+    if (mixinClassName.startsWith("com.illusivesoulworks.elytraslot.mixin.integration." + modId)) {
+      return Services.LOADING.isModLoaded(modId);
     }
     return true;
   }
@@ -45,14 +44,14 @@ public class IntegrationMixinPlugin implements IMixinConfigPlugin {
   }
 
   @Override
-  public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName,
-                        IMixinInfo mixinInfo) {
+  public void preApply(String targetClassName, ClassNode targetClass, String mixinClassName,
+                       IMixinInfo mixinInfo) {
 
   }
 
   @Override
-  public void preApply(String targetClassName, ClassNode targetClass, String mixinClassName,
-                       IMixinInfo mixinInfo) {
+  public void postApply(String targetClassName, ClassNode targetClass, String mixinClassName,
+                        IMixinInfo mixinInfo) {
 
   }
 }
