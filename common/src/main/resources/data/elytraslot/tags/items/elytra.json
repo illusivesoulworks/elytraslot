@@ -105,6 +105,10 @@
     {
       "id": "crystalmod:sapphire_elytra",
       "required": false
+    },
+    {
+      "id": "netherite_ext:netherite_elytra",
+      "required": false
     }
   ]
 }
