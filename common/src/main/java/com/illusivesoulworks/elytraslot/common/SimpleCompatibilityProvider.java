@@ -101,6 +101,11 @@ public class SimpleCompatibilityProvider implements IElytraProvider {
           }
         }
       }
+
+      if (isLoaded.test("netherite_ext")) {
+        ID_TO_TEXTURE.put("netherite_ext:netherite_elytra",
+            new ResourceLocation("netherite_ext:textures/entity/netherite_elytra.png"));
+      }
       init = true;
     }
     return ID_TO_TEXTURE.containsKey(Services.PLATFORM.getId(stack.getItem()).toString());

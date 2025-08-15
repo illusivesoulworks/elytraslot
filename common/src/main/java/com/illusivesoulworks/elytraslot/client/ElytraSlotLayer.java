@@ -55,7 +55,11 @@ public class ElytraSlotLayer<T extends LivingEntity, M extends EntityModel<T>>
       ResourceLocation resourcelocation;
 
       if (elytra.stack().getItem() instanceof ArmorItem) {
-        return;
+        String itemId = Services.PLATFORM.getId(elytra.stack().getItem()).toString();
+
+        if (!itemId.equals("netherite_ext:netherite_elytra")) {
+          return;
+        }
       }
       Services.CLIENT.processLayerRendering(elytra.stack());
 
