@@ -19,7 +19,7 @@ package com.illusivesoulworks.elytraslot;
 
 import com.illusivesoulworks.elytraslot.common.AccessoryElytra;
 import io.wispforest.accessories.api.AccessoriesCapability;
-import io.wispforest.accessories.api.AccessoryRegistry;
+import io.wispforest.accessories.api.core.AccessoryRegistry;
 import io.wispforest.accessories.api.slot.SlotEntryReference;
 import io.wispforest.accessories.api.slot.SlotPredicateRegistry;
 import java.util.List;
