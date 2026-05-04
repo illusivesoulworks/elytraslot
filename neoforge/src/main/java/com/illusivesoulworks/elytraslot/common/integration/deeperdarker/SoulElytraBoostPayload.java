@@ -42,7 +42,7 @@ public record SoulElytraBoostPayload(boolean bool) implements CustomPacketPayloa
       Player player = context.player();
       Level level = player.level();
 
-      if (DeeperDarkerConfig.soulElytraCooldown == -1) {
+      if (DeeperDarkerConfig.CONFIG.soulElytraCooldown.getAsInt() == -1) {
         player.displayClientMessage(
             Component.translatable("item." + DeeperDarker.MOD_ID + ".soul_elytra.no_cooldown"),
             true);
@@ -55,7 +55,7 @@ public record SoulElytraBoostPayload(boolean bool) implements CustomPacketPayloa
             new FireworkRocketEntity(level, new ItemStack(Items.FIREWORK_ROCKET), player);
         level.addFreshEntity(rocket);
         player.getCooldowns()
-            .addCooldown(DDItems.SOUL_ELYTRA.get(), DeeperDarkerConfig.soulElytraCooldown);
+            .addCooldown(DDItems.SOUL_ELYTRA.get(), DeeperDarkerConfig.CONFIG.soulElytraCooldown.getAsInt());
       }
     });
   }

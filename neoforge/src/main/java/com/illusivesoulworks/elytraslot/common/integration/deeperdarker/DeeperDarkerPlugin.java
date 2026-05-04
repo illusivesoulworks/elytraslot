@@ -47,7 +47,7 @@ public class DeeperDarkerPlugin {
         float percent = player.getCooldowns().getCooldownPercent(DDItems.SOUL_ELYTRA.get(), 0);
         player.displayClientMessage(
             Component.translatable("item." + DeeperDarker.MOD_ID + ".soul_elytra.cooldown",
-                (int) Math.ceil(percent * DeeperDarkerConfig.soulElytraCooldown / 20)), true);
+                (int) Math.ceil(percent * DeeperDarkerConfig.CONFIG.soulElytraCooldown.getAsInt() / 20)), true);
       }
     }
   }
