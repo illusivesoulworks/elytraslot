@@ -1,131 +1,38 @@
-import javax.net.ssl.HttpsURLConnection
-import java.nio.charset.StandardCharsets
-
 plugins {
-    // see https://fabricmc.net/develop/ for new versions
-    id 'fabric-loom' version '1.10-SNAPSHOT' apply false
-    // see https://projects.neoforged.net/neoforged/moddevgradle for new versions
-    id 'net.neoforged.moddev' version '2.0.89' apply false
+    id 'java-library'
+    id 'net.neoforged.gradle.userdev' version '7.1.39'
 }
 
-def publishDiscord() {
-    try {
-        def cfLinks = new StringJoiner('\\n')
+group = 'com.illusivesoulworks.elytraslot'
+version = '10.0.1+1.21.11-port.1'
+base.archivesName = 'elytraslot-neoforge'
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
-        if (project(':fabric').hasProperty('curse_link')) {
-            cfLinks.add("[Fabric](${project(':fabric').findProperty('curse_link')})")
-        }
+repositories {
+    maven { url = 'https://maven.creeperhost.net/' }
+    maven {
+        url = 'https://maven.theillusivec4.top/'
+        content { includeGroup 'top.theillusivec4.curios' }
+    }
+    mavenCentral()
+}
 
-        if (project(':neoforge').hasProperty('curse_link')) {
-            cfLinks.add("[NeoForge](${project(':neoforge').findProperty('curse_link')})")
-        }
-        def modrinthLinks = new StringJoiner('\\n')
+dependencies {
+    implementation 'net.neoforged:neoforge:21.11.42'
+    compileOnly 'top.theillusivec4.curios:curios-neoforge:14.0.0+1.21.11:api'
+}
 
-        if (project(':fabric').hasProperty('modrinth_link')) {
-            modrinthLinks.add("[Fabric](${project(':fabric').findProperty('modrinth_link')})")
-        }
+tasks.named('jar', Jar) {
+    from 'COPYING', 'COPYING.LESSER', 'LICENSE'
+}
 
-        if (project(':neoforge').hasProperty('curse_link')) {
-            modrinthLinks.add("[NeoForge](${project(':neoforge').findProperty('modrinth_link')})")
-        }
-        println(cfLinks)
-        println(modrinthLinks)
-        def changelog = file("CHANGELOG_LATEST.md").getText()
-        changelog = changelog.substring(changelog.indexOf("##"))
-        changelog = changelog.replaceAll("\n", "\\\\n")
-
-        if (changelog.length() >= 1024) {
-            changelog = changelog.substring(0, changelog.length() - 100)
-            changelog = changelog + "...[(See more)](${changelog_link})"
-        }
-        println(changelog)
-        int color = 65392
-
-        if (release_type == "beta") {
-            color = 16763904
-        } else if (release_type == "alpha") {
-            color = 16724273
-        }
-        final String message = """
-            {
-              "embeds": [
-                {
-                  "title": "${mod_name} ${version}",
-                  "color": ${color},
-                  "fields": [
-                    {
-                      "name": "Minecraft Versions",
-                      "value": "${release_versions.replaceAll(",", ", ")}"
-                    },
-                    {
-                      "name": "CurseForge",
-                      "value": "${cfLinks}",
-                      "inline": true
-                    },
-                    {
-                      "name": "Modrinth",
-                      "value": "${modrinthLinks}",
-                      "inline": true
-                    },
-                    {
-                      "name": "Changelog",
-                      "value": "${changelog}"
-                    }
-                  ],
-                  "thumbnail": {
-                    "url": "${discord_thumbnail}"
-                  }
-                }
-              ]
-            }
-            """
-        println(message)
-        final URL url = URI.create("${System.getenv('DISCORD_WEBHOOK')}").toURL()
-        final HttpsURLConnection connection = (HttpsURLConnection) url.openConnection()
-        connection.addRequestProperty("Content-Type", "application/json; charset=UTF-8")
-        connection.addRequestProperty("User-Agent", "${mod_name} Gradle Upload")
-        connection.setDoOutput(true)
-        connection.setRequestMethod("POST")
-        connection.connect()
-
-        try (OutputStream out = connection.getOutputStream()) {
-            out.write(message.getBytes(StandardCharsets.UTF_8))
-        }
-        connection.getInputStream().close()
-        connection.disconnect()
-    } catch (IOException e) {
-        e.printStackTrace()
+tasks.named('processResources', ProcessResources) {
+    inputs.property 'version', version
+    filesMatching('META-INF/neoforge.mods.toml') {
+        expand(version: project.version)
     }
 }
 
-def ordered(String... dependencyPaths) {
-    def dependencies = dependencyPaths.collect { tasks.getByPath(it) }
-    for (int i = 0; i < dependencies.size() - 1; i++) {
-        dependencies[i + 1].mustRunAfter(dependencies[i])
-    }
-    return dependencies
-}
-
-tasks.register('publishFabric') {
-    dependsOn ordered(':fabric:modrinth', ':fabric:publishCurseForge')
-
-    doLast {
-        publishDiscord()
-    }
-}
-
-tasks.register('publishNeoForge') {
-    dependsOn ordered(':neoforge:modrinth', ':neoforge:publishCurseForge')
-
-    doLast {
-        publishDiscord()
-    }
-}
-
-tasks.register('publishFabricNeoForge') {
-    dependsOn ordered(':fabric:modrinth', ':fabric:publishCurseForge', ':neoforge:modrinth', ':neoforge:publishCurseForge')
-
-    doLast {
-        publishDiscord()
-    }
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
 }
