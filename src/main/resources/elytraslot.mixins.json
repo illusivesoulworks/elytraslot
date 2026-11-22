@@ -1,0 +1,9 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.illusivesoulworks.elytraslot.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": ["LivingEntityMixin"],
+  "client": ["CapeLayerMixin"],
+  "injectors": { "defaultRequire": 1 }
+}
